@@ -1,7 +1,6 @@
 # `hailort/libhailort/src/net_flow/pipeline` module walkthrough
 
 ## Overview
-<<<<<<< ours
 The `net_flow/pipeline` directory implements the orchestration layer for asynchronous inference pipelines, covering buffer lifetime, execution threads, and post-processing operations. The pipeline is built around `PipelineBuffer` objects managed by `BufferPool` instances, while the `PipelineElement` hierarchy and the `AsyncPipeline` builder wire stream transformations to the hardware interfaces.
 【F:hailort/libhailort/src/net_flow/pipeline/pipeline.hpp†L31-L168】
 【F:hailort/libhailort/src/net_flow/pipeline/async_infer_runner.cpp†L26-L149】
@@ -39,8 +38,6 @@ Each queue element receives the same `SpscQueue` and couples it with activation 
 When `AsyncPipelineBuilder::add_push_queue_element` inserts an `AsyncPushQueueElement`, it rewires the upstream pad to the new queue element before connecting to the hardware element.
 【F:hailort/libhailort/src/net_flow/pipeline/async_pipeline_builder.cpp†L191-L205】 
 A preemption layer can therefore derive from `BaseQueueElement` and override `run_push_async` or `run_in_thread` to enqueue intercepted work into a policy queue, reorder it, and forward it when allowed. The existing `SpscQueue` continues to manage frame ownership, while the custom element focuses on scheduling and preemption rules.
-=======
->>>>>>> theirs
 The `net_flow/pipeline` directory implements the orchestration layer for asynchronous inference pipelines, covering buffer lifetime, execution threads, and post-processing operations. The pipeline is built around `PipelineBuffer` objects managed by `BufferPool` instances, while the `PipelineElement` hierarchy and the `AsyncPipeline` builder wire stream transformations to the hardware interfaces.【F:hailort/libhailort/src/net_flow/pipeline/pipeline.hpp†L31-L168】【F:hailort/libhailort/src/net_flow/pipeline/async_infer_runner.cpp†L26-L149】
 
 ## Core buffer and pool abstractions
