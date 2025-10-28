@@ -18,6 +18,32 @@ match the transport backend.
 `VdmaDevice::add_hef`. This flow is responsible for parsing HEF network groups,
 initializing the CoreOp controller, configuring stream descriptors, and preparing
 DMA resources for host-to-device communication.
+`VdmaDevice::add_hef`. The function performs several backend-specific steps
+before the resulting `ConfiguredNetworkGroup` handles are returned:
+
+1. **Driver/session preparation** – The call starts by marking the device as
+   used via `mark_as_used` and, if this is the first configuration on the
+   process, clears any previously configured applications
+   (`clear_configured_apps`). It then instantiates the shared `CacheManager`,
+   the vDMA `InterruptsDispatcher`, and the `TransferLauncher` objects that will
+   serve all configured CoreOps.
+2. **Network-group assembly** – `create_networks_group_vector` iterates all HEF
+   network groups. It merges user provided `ConfigureNetworkParams` (or builds
+   defaults through `hef.create_configure_params`), validates the batch-size
+   relationship, and calls `create_core_ops_metadata` to fetch the per-CoreOp
+   metadata that matches the device architecture and partial cluster layout.
+3. **CoreOp materialization** – For every network group,
+   `create_configured_network_group` constructs the runtime objects. This
+   routine creates caches from the selected CoreOp metadata, builds a
+   `ResourcesManager` (responsible for descriptor/buffer allocations and engine
+   reservations), instantiates a `VdmaConfigCoreOp`, and asks it to
+   `create_streams_from_config_params`. It then validates that all boundary
+   streams declared in the HEF were created before wrapping the CoreOp inside a
+   `ConfiguredNetworkGroupBase` instance.
+
+Through this sequence the PCIe/integrated backend binds the HEF definition to
+the hardware engines, caches, and DMA infrastructure that the host runtime uses
+for submission.
 
 ## Ethernet Devices
 `hailort/libhailort/src/eth/eth_device.cpp` provides the Ethernet-specific

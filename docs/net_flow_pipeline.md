@@ -1,6 +1,7 @@
 # `hailort/libhailort/src/net_flow/pipeline` module walkthrough
 
 ## Overview
+<<<<<<< ours
 The `net_flow/pipeline` directory implements the orchestration layer for asynchronous inference pipelines, covering buffer lifetime, execution threads, and post-processing operations. The pipeline is built around `PipelineBuffer` objects managed by `BufferPool` instances, while the `PipelineElement` hierarchy and the `AsyncPipeline` builder wire stream transformations to the hardware interfaces.
 【F:hailort/libhailort/src/net_flow/pipeline/pipeline.hpp†L31-L168】
 【F:hailort/libhailort/src/net_flow/pipeline/async_infer_runner.cpp†L26-L149】
@@ -38,6 +39,8 @@ Each queue element receives the same `SpscQueue` and couples it with activation 
 When `AsyncPipelineBuilder::add_push_queue_element` inserts an `AsyncPushQueueElement`, it rewires the upstream pad to the new queue element before connecting to the hardware element.
 【F:hailort/libhailort/src/net_flow/pipeline/async_pipeline_builder.cpp†L191-L205】 
 A preemption layer can therefore derive from `BaseQueueElement` and override `run_push_async` or `run_in_thread` to enqueue intercepted work into a policy queue, reorder it, and forward it when allowed. The existing `SpscQueue` continues to manage frame ownership, while the custom element focuses on scheduling and preemption rules.
+=======
+>>>>>>> theirs
 The `net_flow/pipeline` directory implements the orchestration layer for asynchronous inference pipelines, covering buffer lifetime, execution threads, and post-processing operations. The pipeline is built around `PipelineBuffer` objects managed by `BufferPool` instances, while the `PipelineElement` hierarchy and the `AsyncPipeline` builder wire stream transformations to the hardware interfaces.【F:hailort/libhailort/src/net_flow/pipeline/pipeline.hpp†L31-L168】【F:hailort/libhailort/src/net_flow/pipeline/async_infer_runner.cpp†L26-L149】
 
 ## Core buffer and pool abstractions
@@ -67,6 +70,7 @@ When `AsyncPipelineBuilder::add_push_queue_element` inserts an `AsyncPushQueueEl
 ## Asynchronous pipeline assembly
 ### Role of AsyncPipelineBuilder
 <<<<<<< ours
+<<<<<<< ours
 `AsyncPipelineBuilder` resolves AUTO values in the user-facing formats, prepares per-input preprocessing and queue elements, and connects them to the hardware elements. For outputs it inspects metadata such as NMS, IOU, or Softmax requirements, attaches the matching post-processing elements, and adds demultiplexers or transforms as needed.
 【F:hailort/libhailort/src/net_flow/pipeline/async_pipeline_builder.cpp†L26-L200】
 【F:hailort/libhailort/src/net_flow/pipeline/async_pipeline_builder.cpp†L200-L360】
@@ -82,6 +86,8 @@ When `AsyncPipelineBuilder::add_push_queue_element` inserts an `AsyncPushQueueEl
 3. `AsyncInferRunnerImpl` runs and stops the pipeline while `AsyncPipeline` performs the coordinated shutdown and buffer reclamation on errors.
 【F:hailort/libhailort/src/net_flow/pipeline/async_infer_runner.cpp†L62-L200】
 =======
+=======
+>>>>>>> theirs
 `AsyncPipelineBuilder` resolves AUTO values in the user-facing formats, prepares per-input preprocessing and queue elements, and connects them to the hardware elements. For outputs it inspects metadata such as NMS, IOU, or Softmax requirements, attaches the matching post-processing elements, and adds demultiplexers or transforms as needed.【F:hailort/libhailort/src/net_flow/pipeline/async_pipeline_builder.cpp†L26-L200】【F:hailort/libhailort/src/net_flow/pipeline/async_pipeline_builder.cpp†L200-L360】
 
 ### AsyncPipeline and AsyncInferRunner
@@ -91,4 +97,7 @@ When `AsyncPipelineBuilder::add_push_queue_element` inserts an `AsyncPushQueueEl
 1. `AsyncPipelineBuilder` expands input formats, allocates preprocessing queues, and wires them into the hardware elements.【F:hailort/libhailort/src/net_flow/pipeline/async_pipeline_builder.cpp†L72-L164】
 2. Hardware outputs traverse the configured NMS/demux elements, perform format transforms, and reach the final queue elements.【F:hailort/libhailort/src/net_flow/pipeline/async_pipeline_builder.cpp†L191-L360】
 3. `AsyncInferRunnerImpl` runs and stops the pipeline while `AsyncPipeline` performs the coordinated shutdown and buffer reclamation on errors.【F:hailort/libhailort/src/net_flow/pipeline/async_infer_runner.cpp†L62-L200】
+<<<<<<< ours
+>>>>>>> theirs
+=======
 >>>>>>> theirs
