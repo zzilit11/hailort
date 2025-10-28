@@ -27,3 +27,12 @@
   - Surface stream, v-stream, and latency metadata aggregated from the underlying CoreOps and their metadata.【F:hailort/libhailort/src/network_group/network_group_internal.hpp†L71-L205】
 - **Metadata linkage**: `NetworkGroupMetadata` associates the group name with the architecture-specific CoreOp metadata map, sorted outputs, supported feature flags, and optional post-processing metadata.【F:hailort/libhailort/src/hef/core_op_metadata.hpp†L198-L219】
 - **Composition**: A configured network group typically wraps a vector of CoreOps, allowing the runtime to coordinate multiple device partitions or physical devices under one activation handle.【F:hailort/libhailort/src/network_group/network_group_internal.hpp†L15-L205】
+<<<<<<< ours
+=======
+
+## Relationship between HEF, Network Groups, and CoreOps
+- **HEF as the source of truth**: `Hef::Impl` exposes the network groups and their CoreOp definitions parsed from the HEF file, letting the runtime ask for the groups by name and retrieve their metadata bundles.【F:hailort/libhailort/src/hef/hef_internal.hpp†L283-L288】
+- **Network-group materialization**: Device backends iterate the HEF-defined network groups, choose or synthesize `ConfigureNetworkParams`, and then construct the runtime `ConfiguredNetworkGroup` objects. During this loop they also enforce batch-size rules and collect CoreOp metadata for the device’s partial-cluster layout.【F:hailort/libhailort/src/vdma/vdma_device.cpp†L341-L432】
+- **CoreOp instantiation**: For each HEF network group, the backend builds CoreOps (usually a single `VdmaConfigCoreOp`) from the retrieved metadata, wires them to resource managers, and finally packages them into a `ConfiguredNetworkGroupBase` handle that the user manipulates.【F:hailort/libhailort/src/vdma/vdma_device.cpp†L380-L429】【F:hailort/libhailort/src/network_group/network_group.cpp†L193-L200】
+- **Runtime relationship**: The resulting configured network group owns the CoreOp instances created from the HEF data, so activating the group implicitly activates its CoreOps, while deactivation tears them down and releases the resources originally described by the HEF.【F:hailort/libhailort/src/network_group/network_group_internal.hpp†L59-L176】【F:hailort/libhailort/src/network_group/network_group.cpp†L203-L220】
+>>>>>>> theirs
