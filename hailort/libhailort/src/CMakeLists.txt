@@ -21,6 +21,8 @@ set(HAILORT_CPP_SOURCES
     hailort_defaults.cpp
 )
 
+set(HAILORT_LIBRARY_OUTPUT_NAME "libhailort" CACHE STRING "Output name of the HailoRT shared library")
+
 add_subdirectory(utils)
 add_subdirectory(os)
 add_subdirectory(device_common)
@@ -135,8 +137,9 @@ set(HAILORT_PUBLIC_HEADERS
 set_target_properties(libhailort PROPERTIES
     PUBLIC_HEADER "${HAILORT_PUBLIC_HEADERS}"
     PREFIX ""
+    OUTPUT_NAME ${HAILORT_LIBRARY_OUTPUT_NAME}
     VERSION ${HAILORT_MAJOR_VERSION}.${HAILORT_MINOR_VERSION}.${HAILORT_REVISION_VERSION}
-    # SOVERSION ${HAILORT_MAJOR_VERSION}
+    SOVERSION ${HAILORT_MAJOR_VERSION}
 
     CXX_STANDARD              14
     CXX_STANDARD_REQUIRED     YES
