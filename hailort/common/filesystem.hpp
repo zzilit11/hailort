@@ -18,9 +18,7 @@
 #include <string>
 #include <chrono>
 
-#if defined(__GNUC__)
 #include <dirent.h>
-#endif
 
 
 namespace hailort
@@ -44,8 +42,8 @@ public:
     /**
      * Gets the path to the temporary directory.
      *
-     * @return Upon success, returns Expected of the temporary directory path string, ending with / on posix systems
-     * or with \ on windows systems. Otherwise, returns Unexpected of ::hailo_status error.
+     * @return Upon success, returns Expected of the temporary directory path string, ending with /.
+     * Otherwise, returns Unexpected of ::hailo_status error.
      */
     static Expected<std::string> get_temp_path();
 
@@ -75,41 +73,9 @@ public:
     }
 
 private:
-    // OS-specific filesystem directory separator char (i.e. backslash on Windows or forward slash on UNIX)
+    // Filesystem directory separator char.
     static const char *SEPARATOR;
 
-    #if defined(_MSC_VER)
-
-    struct FileInfo {
-        std::string path;
-        DWORD       attrs;
-    };
-    
-    static bool is_regular_or_readonly_file(DWORD attrs);
-    
-    // TODO: supoport unicode
-    class FindFile final {
-    public:
-        static Expected<FindFile> create(const std::string &dir_path);
-        ~FindFile();
-        FindFile(const FindFile &other) = delete;
-        FindFile &operator=(const FindFile &other) = delete;
-        FindFile &operator=(FindFile &&other) = delete;
-        FindFile(FindFile &&other);
-        
-        Filesystem::FileInfo get_cur_file_info() const;
-        // Will return HAILO_INVALID_OPERATION when the iteration is complete or HAILO_FILE_OPERATION_FAILURE upon failure
-        hailo_status next_file();
-
-    private:
-        FindFile(HANDLE find_hadle, const WIN32_FIND_DATAA &find_data);
-
-        HANDLE m_find_handle;
-        WIN32_FIND_DATAA m_find_data;
-    };
-    
-    #else
-    
     class DirWalker final {
     public:
         static Expected<DirWalker> create(const std::string &dir_path);
@@ -127,12 +93,8 @@ private:
         DIR *m_dir;
         const std::string m_path_string;
     };
-    
-    #endif
 };
 
-// TODO: HRT-7304 - Add support for windows
-#if defined(__GNUC__)
 class TempFile {
 public:
     static Expected<TempFile> create(const std::string &file_name, const std::string &file_directory = "");
@@ -165,7 +127,6 @@ private:
     FILE *m_fp;
     int m_fd;
 };
-#endif
 
 } /* namespace hailort */
 

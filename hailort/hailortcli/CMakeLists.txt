@@ -38,13 +38,10 @@ set(HAILORTCLI_CPP_FILES
     download_action_list_command.cpp
     )
 
-if(UNIX)
-    # Unix only modules
-    set(HAILORTCLI_CPP_FILES ${HAILORTCLI_CPP_FILES}
-        udp_rate_limiter_command.cpp
-        measure_nnc_performance_command.cpp
-        )
-endif()
+set(HAILORTCLI_CPP_FILES ${HAILORTCLI_CPP_FILES}
+    udp_rate_limiter_command.cpp
+    measure_nnc_performance_command.cpp
+    )
 
 # 'config_definitions_json_file' is used in generate_definitions_json_str.in for configure_file()
 file(READ "${PROJECT_SOURCE_DIR}/common/config_definitions.json" config_definitions_json_file)
@@ -76,10 +73,6 @@ target_link_libraries(hailortcli
     DotWriter
     scheduler_mon_proto
     profiler_proto)
-
-if(WIN32)
-    target_link_libraries(hailortcli winmm.lib) # Used for timeBeginPeriod, timeEndPeriod
-endif()
 
 target_include_directories(hailortcli
     PRIVATE

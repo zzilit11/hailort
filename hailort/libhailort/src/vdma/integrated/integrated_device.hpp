@@ -18,9 +18,7 @@
 
 #include <memory>
 
-#ifdef __linux__
 #include <linux/gpio.h>
-#endif
 
 
 namespace hailort
@@ -62,7 +60,7 @@ private:
     IntegratedDevice(std::unique_ptr<HailoRTDriver> &&driver, hailo_status &status);
     std::shared_ptr<SocPowerMeasurement> m_power_measurement_data;
 
-#if defined(__linux__) && defined(GPIO_V2_GET_LINE_IOCTL)
+#ifdef GPIO_V2_GET_LINE_IOCTL
     class GpioReader final {
     public:
         GpioReader() : m_fd(-1), m_request_fd(-1) {}

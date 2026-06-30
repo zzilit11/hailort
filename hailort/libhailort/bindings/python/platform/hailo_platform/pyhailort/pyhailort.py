@@ -4,8 +4,6 @@ import signal
 import struct
 import warnings
 
-import sys
-
 from collections import deque
 from dataclasses import dataclass
 from argparse import ArgumentTypeError
@@ -197,8 +195,6 @@ class HailoUdpScan(object):
 
 class NetworkRateLimiter(object):
     def __init__(self, ip, port, rate_bytes_per_sec):
-        if sys.platform != 'linux':
-            raise HailoRTInvalidOperationException('NetworkRateLimiter is supported only on UNIX os')
         self._ip = ip
         self._port = port
         self._rate_bytes_per_sec = rate_bytes_per_sec
@@ -1944,9 +1940,7 @@ class Control:
     def __init__(self, device: '_pyhailort.Device'):
         self.__device = device
 
-        # TODO: should remove?
-        if sys.platform != "win32":
-            signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGWINCH])
+        signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGWINCH])
 
         self._identify_info = self.identify()
 

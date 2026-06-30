@@ -27,11 +27,6 @@
 #include <list>
 #include <cerrno>
 
-#ifdef __QNX__
-#include <sys/mman.h>
-#endif // __QNX__
-
-
 namespace hailort
 {
 
@@ -42,7 +37,7 @@ static_assert((0 == ((ONGOING_TRANSFERS_SIZE - 1) & ONGOING_TRANSFERS_SIZE)), "O
 
 #define MIN_ACTIVE_TRANSFERS_SCALE (2)
 
-#if defined(HAILO_SUPPORT_MULTI_PROCESS) || defined(_WIN32)
+#if defined(HAILO_SUPPORT_MULTI_PROCESS)
 #define MAX_ACTIVE_TRANSFERS_SCALE (8)
 #else
 #define MAX_ACTIVE_TRANSFERS_SCALE (32)
@@ -90,15 +85,8 @@ struct IrqData {
 // Bitmap per engine
 using ChannelsBitmap = std::array<uint32_t, MAX_VDMA_ENGINES_COUNT>;
 
-#if defined(__linux__) || defined(_WIN32)
 // Unique handle returned from the driver.
 using vdma_mapped_buffer_driver_identifier = uintptr_t;
-#elif defined(__QNX__)
-// Identifier is the shared memory file descriptor.
-using vdma_mapped_buffer_driver_identifier = int;
-#else
-#error "unsupported platform!"
-#endif
 
 typedef uint64_t desc_list_handle_t;
 static constexpr desc_list_handle_t INVALID_DESC_LIST_HANDLE = 0; // Desc-list handles start at 1.
@@ -440,18 +428,12 @@ private:
     size_t m_dma_engines_count;
     DeviceBoardType m_board_type;
     bool m_is_fw_loaded;
-#ifdef __QNX__
-    pid_t m_resource_manager_pid;
-#endif // __QNX__
-
-#ifdef __linux__
     // TODO: HRT-11595 fix linux driver deadlock and remove the mutex.
     // Currently, on the linux, the mmap syscall is called under current->mm lock held. Inside, we lock the board
     // mutex. On other ioctls, we first lock the board mutex, and then lock current->mm mutex (For example - before
     // pinning user address to memory and on copy_to_user/copy_from_user calls).
     // Need to refactor the driver lock mechanism and then remove the mutex from here.
     std::mutex m_driver_lock;
-#endif
 
     // TODO HRT-11937: when ioctl is combined, move caching to driver
     struct MappedBufferInfo {

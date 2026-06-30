@@ -350,14 +350,9 @@ inline hailo_status get_status(const Expected<T> &exp)
 
 #define TRY_WITH_ACCEPTABLE_STATUS(valid_error, var_decl, expr, ...) _TRY_WITH_ACCEPTABLE_STATUS(valid_error, _HAILO_CONCAT(__expected, __COUNTER__), var_decl, expr, __VA_ARGS__)
 
-#ifndef _MSC_VER
 #define IGNORE_DEPRECATION_WARNINGS_BEGIN _Pragma("GCC diagnostic push") \
                                           _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #define IGNORE_DEPRECATION_WARNINGS_END  _Pragma("GCC diagnostic pop")
-#else
-#define IGNORE_DEPRECATION_WARNINGS_BEGIN
-#define IGNORE_DEPRECATION_WARNINGS_END
-#endif
 
 constexpr bool is_powerof2(size_t v) {
     // bit trick

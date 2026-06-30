@@ -24,11 +24,8 @@ set(C_EXAMPLE_TARGETS
     c_notification_callback_example
 )
 
-if(NOT CMAKE_SYSTEM_NAME STREQUAL QNX)
-    # TODO: HRT-10956 support QNX async examples
-    add_subdirectory(raw_async_streams_single_thread_example)
-    set(C_EXAMPLE_TARGETS ${C_EXAMPLE_TARGETS} c_raw_async_streams_single_thread_example)
-endif()
+add_subdirectory(raw_async_streams_single_thread_example)
+set(C_EXAMPLE_TARGETS ${C_EXAMPLE_TARGETS} c_raw_async_streams_single_thread_example)
 
 add_custom_target(c_hailort_examples)
 add_dependencies(c_hailort_examples ${C_EXAMPLE_TARGETS})

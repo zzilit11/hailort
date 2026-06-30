@@ -526,7 +526,7 @@ Expected<std::vector<Buffer>> Text2ImageGenerator::Impl::generate(const std::str
     CHECK_SUCCESS(status);
 
     // TODO: HRT-15972 - use m_params.samples_count()
-    (void)m_params; // not used yet, added to fix android compilation
+    (void)m_params;
     std::vector<Buffer> result;
     result.reserve(TEXT2IMAGE_SAMPLES_COUNT_DEFAULT_VALUE);
     result.emplace_back(std::move(buffer));

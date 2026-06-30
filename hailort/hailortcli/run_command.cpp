@@ -53,7 +53,6 @@ static const char *RUNTIME_DATA_OUTPUT_PATH_HEF_PLACE_HOLDER = "<hef>";
 static const char *RUNTIME_DATA_BATCH_TO_MEASURE_OPT_LAST = "last";
 static const char *RUNTIME_DATA_BATCH_TO_MEASURE_OPT_DEFAULT = "2";
 
-#ifndef _MSC_VER
 void user_signal_handler_func(int signum)
 {
     if (USER_SIGNAL == signum)
@@ -61,19 +60,14 @@ void user_signal_handler_func(int signum)
         wait_for_exit_cv.notify_one();
     }
 }
-#endif
 
 hailo_status wait_for_exit_with_timeout(std::chrono::seconds time_to_run)
 {
-#if defined(__linux__)
     sighandler_t prev_handler = signal(USER_SIGNAL, user_signal_handler_func);
     CHECK(prev_handler != SIG_ERR, HAILO_INVALID_OPERATION, "signal failed, errno = {}", errno);
     std::mutex mutex;
     std::unique_lock<std::mutex> condition_variable_lock(mutex);
     wait_for_exit_cv.wait_for(condition_variable_lock, time_to_run);
-#else
-    std::this_thread::sleep_for(time_to_run);
-#endif
     return HAILO_SUCCESS;
 }
 

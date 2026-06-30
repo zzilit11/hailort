@@ -76,11 +76,7 @@ typedef struct {
     bool is_core_hw_padding_config_in_dfc;
 } CONTEXT_SWITCH_DEFS__stream_reg_info_t;
 
-#if defined(_MSC_VER)
-typedef enum : uint8_t {
-#else
 typedef enum __attribute__((packed)) {
-#endif
     CONTEXT_SWITCH_DEFS__ACTION_TYPE_FETCH_CFG_CHANNEL_DESCRIPTORS = 0,
     CONTEXT_SWITCH_DEFS__ACTION_TYPE_TRIGGER_SEQUENCER,
     CONTEXT_SWITCH_DEFS__ACTION_TYPE_FETCH_DATA_FROM_VDMA_CHANNEL,

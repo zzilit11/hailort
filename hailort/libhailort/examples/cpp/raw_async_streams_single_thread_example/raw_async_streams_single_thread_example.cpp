@@ -14,26 +14,16 @@
 #include <queue>
 #include <condition_variable>
 
-#if defined(__unix__)
 #include <sys/mman.h>
-#endif
 
 using namespace hailort;
 
 using AlignedBuffer = std::shared_ptr<uint8_t>;
 static AlignedBuffer page_aligned_alloc(size_t size)
 {
-#if defined(__unix__)
     auto addr = mmap(NULL, size, PROT_WRITE | PROT_READ, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
     if (MAP_FAILED == addr) throw std::bad_alloc();
     return AlignedBuffer(reinterpret_cast<uint8_t*>(addr), [size](void *addr) { munmap(addr, size); });
-#elif defined(_MSC_VER)
-    auto addr = VirtualAlloc(NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-    if (!addr) throw std::bad_alloc();
-    return AlignedBuffer(reinterpret_cast<uint8_t*>(addr), [](void *addr){ VirtualFree(addr, 0, MEM_RELEASE); });
-#else
-#pragma error("Aligned alloc not supported")
-#endif
 }
 
 static hailo_status infer(ConfiguredNetworkGroup &network_group)

@@ -1,12 +1,6 @@
 cmake_minimum_required(VERSION 3.5.0)
 
-if(WIN32)
-    set(HAILORT_SERVICE_OS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/windows")
-elseif(UNIX)
-    set(HAILORT_SERVICE_OS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/unix")
-else()
-    message(FATAL_ERROR "Unexpeced platform target, stopping build")
-endif()
+set(HAILORT_SERVICE_OS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/unix")
 
 add_executable(hailort_service
     hailort_rpc_service.cpp
@@ -38,26 +32,24 @@ if(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(SYSTEMD_UNIT_DIR ${CMAKE_INSTALL_PREFIX}/${SYSTEMD_UNIT_DIR})
 endif()
 
-if (UNIX)
-    # Install service's environment variables file
-    set(ENV_VARS_FILE_DIR ${CMAKE_INSTALL_SYSCONFDIR}/default/)
-    set(HAILORT_SERVICE_ENV_VARS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/hailort_service)
-    install(
-        FILES "${HAILORT_SERVICE_ENV_VARS_FILE}"
-        DESTINATION "${ENV_VARS_FILE_DIR}"
-        CONFIGURATIONS Release
-        COMPONENT hailort_service
-    )
+# Install service's environment variables file
+set(ENV_VARS_FILE_DIR ${CMAKE_INSTALL_SYSCONFDIR}/default/)
+set(HAILORT_SERVICE_ENV_VARS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/hailort_service)
+install(
+    FILES "${HAILORT_SERVICE_ENV_VARS_FILE}"
+    DESTINATION "${ENV_VARS_FILE_DIR}"
+    CONFIGURATIONS Release
+    COMPONENT hailort_service
+)
 
-    # Install systemd unit file
-    set(HAILORT_SERVICE_UNIT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/hailort.service)
-    install(
-        FILES "${HAILORT_SERVICE_UNIT_FILE}"
-        DESTINATION "${SYSTEMD_UNIT_DIR}"
-        CONFIGURATIONS Release
-        COMPONENT hailort_service
-    )
-endif()
+# Install systemd unit file
+set(HAILORT_SERVICE_UNIT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/hailort.service)
+install(
+    FILES "${HAILORT_SERVICE_UNIT_FILE}"
+    DESTINATION "${SYSTEMD_UNIT_DIR}"
+    CONFIGURATIONS Release
+    COMPONENT hailort_service
+)
 
 install(
     TARGETS hailort_service

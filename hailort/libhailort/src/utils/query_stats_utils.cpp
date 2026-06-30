@@ -27,12 +27,6 @@
 
 namespace hailort {
 
-// Platform-specific macros for popen and pclose
-#ifdef _WIN32
-#define popen _popen
-#define pclose _pclose
-#endif
-
 #define MEM_INFO_PATH ("/proc/meminfo")
 #define CPU_INFO_PATH ("/proc/stat")
 #define PERFORMANCE_QUERY_SAMPLING_TIME_WINDOW (std::chrono::milliseconds(100))

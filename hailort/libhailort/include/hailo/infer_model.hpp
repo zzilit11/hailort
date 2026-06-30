@@ -87,8 +87,7 @@ public:
              * On output streams, the actual buffer allocated size must be aligned to PAGE_SIZE as well - otherwise some
              * memory corruption might occur at the end of the last page. For example, if the buffer size is 4000
              * bytes, the actual buffer size should be at least 4096 bytes. To fill all requirements, it is recommended
-             * to allocate the buffer with standard page allocation function provided by the os (mmap on linux,
-             * VirtualAlloc in windows).
+             * to allocate the buffer with standard page allocation function provided by the os (`mmap` on Linux).
              *
              * @param[in] view      The new buffer to be set.
              * @return Upon success, returns ::HAILO_SUCCESS. Otherwise, returns a ::hailo_status error.

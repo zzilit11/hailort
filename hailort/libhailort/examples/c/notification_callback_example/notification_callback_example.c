@@ -17,11 +17,7 @@
 
 void sleep_seconds(uint32_t duration_seconds)
 {
-#if defined(__unix__) || defined(__QNX__)
     sleep(duration_seconds);
-#else
-    Sleep(duration_seconds);
-#endif
 }
 
 void callback(hailo_device device, const hailo_notification_t *notification, void *opaque)

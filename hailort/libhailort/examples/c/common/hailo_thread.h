@@ -4,15 +4,13 @@
  **/
 /**
  * @file hailo_thread.h
- * Common threads related functions, for linux and windows
+ * Common Linux thread related functions.
  **/
 
 #ifndef _HAILO_THREAD_H_
 #define _HAILO_THREAD_H_
 
 #include "hailo/hailort.h"
-
-#if defined(__unix__) || defined(__QNX__)
 
 #include <pthread.h>
 #include <unistd.h>
@@ -67,61 +65,5 @@ void hailo_atomic_store(hailo_atomic_int *atomic, int value)
 {
     atomic_store(atomic, value);
 }
-
-#elif defined _MSC_VER // __unix__ || __QNX__
-
-#include <windows.h>
-typedef HANDLE hailo_thread;
-typedef DWORD thread_return_type;
-typedef LONG hailo_atomic_int;
-
-hailo_status hailo_create_thread(thread_return_type(func_ptr)(void*), void* args, hailo_thread *thread_out)
-{
-    *thread_out = CreateThread(NULL, 0, func_ptr, args, 0, NULL);
-    if (NULL == *thread_out) {
-        return HAILO_INTERNAL_FAILURE;
-    }
-    return HAILO_SUCCESS;
-}
-
-hailo_status hailo_join_thread(hailo_thread *thread)
-{
-    DWORD result;
-
-    WaitForSingleObject(*thread, INFINITE);
-    if (!GetExitCodeThread(*thread, &result)) {
-        return HAILO_INTERNAL_FAILURE;
-    }
-    CloseHandle(*thread);
-    return (hailo_status)result;
-}
-
-void hailo_atomic_init(hailo_atomic_int *atomic, int value)
-{
-    InterlockedExchange(atomic, (LONG)value);
-}
-
-int hailo_atomic_load(hailo_atomic_int *atomic)
-{
-    return InterlockedExchangeAdd(atomic, (LONG)0);
-}
-
-int hailo_atomic_fetch_add(hailo_atomic_int *atomic, int value)
-{
-    return InterlockedExchangeAdd(atomic, (LONG)value);
-}
-
-void hailo_atomic_increment(hailo_atomic_int *atomic)
-{
-    InterlockedIncrement(atomic);
-}
-
-void hailo_atomic_store(hailo_atomic_int *atomic, int value)
-{
-    InterlockedExchange(atomic, value);
-}
-
-
-#endif
 
 #endif /* _HAILO_THREAD_H_ */

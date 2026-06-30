@@ -11,11 +11,7 @@ set(hailort_rpc_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/hailort_rpc.grpc.pb.h")
 
 set(HAILO_PROTOBUF_PROTOC $<TARGET_FILE:protobuf::protoc>)
 if(HAILO_BUILD_SERVICE)
-    if(CMAKE_HOST_UNIX)
-        set(HAILO_GRPC_CPP_PLUGIN_EXECUTABLE "${HAILO_EXTERNAL_DIR}/grpc-build/grpc_cpp_plugin")
-    else()
-        set(HAILO_GRPC_CPP_PLUGIN_EXECUTABLE "${HAILO_EXTERNAL_DIR}/grpc-build/Release/grpc_cpp_plugin.exe")
-    endif()
+    set(HAILO_GRPC_CPP_PLUGIN_EXECUTABLE "${HAILO_EXTERNAL_DIR}/grpc-build/grpc_cpp_plugin")
 endif()
 
 add_custom_command(

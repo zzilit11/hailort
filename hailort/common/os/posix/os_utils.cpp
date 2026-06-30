@@ -17,9 +17,6 @@
 #include <sched.h>
 #include <sys/syscall.h>
 
-#if defined(__QNX__)
-#define OS_UTILS__QNX_PAGE_SIZE (4096)
-#endif /* defined(__QNX__) */
 namespace hailort
 {
 
@@ -59,7 +56,6 @@ void OsUtils::set_current_thread_name(const std::string &name)
 
 hailo_status OsUtils::set_current_thread_affinity(uint8_t cpu_index)
 {
-#if defined(__linux__)
     cpu_set_t cpuset;
     CPU_ZERO(&cpuset);
     CPU_SET(cpu_index, &cpuset);
@@ -69,11 +65,6 @@ hailo_status OsUtils::set_current_thread_affinity(uint8_t cpu_index)
     CHECK(rc == 0, HAILO_INTERNAL_FAILURE, "sched_setaffinity failed with status {}", rc);
 
     return HAILO_SUCCESS;
-#elif defined(__QNX__)
-    (void)cpu_index;
-    // TODO: impl on qnx (HRT-10889)
-    return HAILO_NOT_IMPLEMENTED;
-#endif
 }
 
 size_t OsUtils::get_page_size()
@@ -84,7 +75,6 @@ size_t OsUtils::get_page_size()
 
 size_t OsUtils::get_dma_able_alignment()
 {
-#if defined(__linux__)
     // TODO: HRT-12494 after supporting in linux, restore this code
     // Return value if was saved already
     // if (0 != DMA_ABLE_ALIGNMENT) {
@@ -102,12 +92,6 @@ size_t OsUtils::get_dma_able_alignment()
     // return Expected<size_t>(DMA_ABLE_ALIGNMENT);
 
     return get_page_size();
-
-// TODO: implement on qnx (HRT-12356) - only needed when async api is implemented on qnx
-// TODO - URT-13534 - use sys call for QNX OS to get page size
-#elif defined(__QNX__)
-    return OS_UTILS__QNX_PAGE_SIZE;
-#endif
 }
 
 CursorAdjustment::CursorAdjustment(){}

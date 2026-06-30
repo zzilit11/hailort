@@ -191,7 +191,7 @@ public:
      *       the @a hw_shape field inside get_info().
      * @note The address provided must be aligned to the system's page size, and the rest of the page should not be in
      *       use by any other part of the program to ensure proper functioning of the DMA operation. Memory for the
-     *       provided address can be allocated using `mmap` on Unix-like systems or `VirtualAlloc` on Windows.
+     *       provided address can be allocated using `mmap`.
      * @note Pre-mapping @a buffer to DMA via `Device::dma_map()` may improve performance, if @a buffer is used for
      *       multiple async transfers.
      */
@@ -226,7 +226,7 @@ public:
      *       the @a hw_shape field inside get_info().
      * @note The address provided must be aligned to the system's page size, and the rest of the page should not be in
      *       use by any other part of the program to ensure proper functioning of the DMA operation. Memory for the
-     *       provided address can be allocated using `mmap` on Unix-like systems or `VirtualAlloc` on Windows.
+     *       provided address can be allocated using `mmap`.
      * @note Pre-mapping @a buffer to DMA via `Device::dma_map()` may improve performance, if @a buffer is used for
      *       multiple async transfers.
      */
@@ -510,7 +510,7 @@ public:
      *       and the shape is determined by the @a hw_shape field inside get_info().
      * @note The address provided must be aligned to the system's page size, and the rest of the page should not be in
      *       use by any other part of the program to ensure proper functioning of the DMA operation. Memory for the
-     *       provided address can be allocated using `mmap` on Unix-like systems or `VirtualAlloc` on Windows.
+     *       provided address can be allocated using `mmap`.
      * @note Pre-mapping @a buffer to DMA via `Device::dma_map()` may improve performance, if @a buffer is used for
      *       multiple async transfers.
      */
@@ -545,7 +545,7 @@ public:
      *       and the shape is determined by the @a hw_shape field inside get_info()
      * @note The address provided must be aligned to the system's page size, and the rest of the page should not be in
      *       use by any other part of the program to ensure proper functioning of the DMA operation. Memory for the
-     *       provided address can be allocated using `mmap` on Unix-like systems or `VirtualAlloc` on Windows.
+     *       provided address can be allocated using `mmap`.
      * @note Pre-mapping @a buffer to DMA via `Device::dma_map()` may improve performance, if @a buffer is used for
      *       multiple async transfers.
      */

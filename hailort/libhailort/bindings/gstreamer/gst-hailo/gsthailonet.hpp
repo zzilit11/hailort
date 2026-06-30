@@ -30,9 +30,7 @@
 #include "gsthailo_allocator.hpp"
 #include "dma_buf_allocator_wrapper.hpp"
 
-#if defined(__linux__)
-  #include "gsthailo_dmabuf_allocator.hpp"
-#endif /* __linux__ */
+#include "gsthailo_dmabuf_allocator.hpp"
 
 #include <queue>
 #include <condition_variable>

@@ -948,9 +948,6 @@ typedef struct {
      *   - `sudo` privileges are required.
      *   - Alternatively, use the command line tool `hailortcli udp-rate-limiter`, which is also implemented using "Traffic Control".
      *     In this case this member must be set to zero.
-     * - On Windows user-mode rate limiting (via a token-bucket) is used:
-     *   - User-mode rate limiting is designed to consistently keep the stream at the desired rate, however fluctuations will occur.
-     *     This member parameter provides an upper bound on the bandwidth at which the stream will operate.
      */
     uint32_t rate_limit_bytes_per_sec;
 
@@ -1382,11 +1379,6 @@ typedef struct {
     uint16_t class_id;
 } hailo_detection_t;
 
-#if defined(_MSC_VER)
-// TODO: warning C4200
-#pragma warning(push)
-#pragma warning(disable: 4200)
-#endif
 typedef struct {
     /** Number of detections */
     uint16_t count;
@@ -1394,9 +1386,6 @@ typedef struct {
     /** Array of detections (it's size is determined by count field) */
     hailo_detection_t detections[0];
 } hailo_detections_t;
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 typedef struct {
     /** Detection's box coordinates */
@@ -3425,7 +3414,7 @@ HAILORTAPI hailo_status hailo_input_stream_get_async_max_queue_size(hailo_input_
  *       the \e hw_shape field inside ::hailo_stream_info_t.
  * @note The address provided must be aligned to the system's page size, and the rest of the page should not be in
  *       use by any other part of the program to ensure proper functioning of the DMA operation. Memory for the
- *       provided address can be allocated using `mmap` on Unix-like systems or `VirtualAlloc` on Windows.
+ *       provided address can be allocated using `mmap`.
  */
 HAILORTAPI hailo_status hailo_stream_read_raw_buffer_async(hailo_output_stream stream, void *buffer, size_t size,
     hailo_stream_read_async_callback_t user_callback, void *opaque);
@@ -3462,7 +3451,7 @@ HAILORTAPI hailo_status hailo_stream_read_raw_buffer_async(hailo_output_stream s
  *       the \e hw_shape field inside ::hailo_stream_info_t.
  * @note The address provided must be aligned to the system's page size, and the rest of the page should not be in
  *       use by any other part of the program to ensure proper functioning of the DMA operation. Memory for the
- *       provided address can be allocated using `mmap` on Unix-like systems or `VirtualAlloc` on Windows.
+ *       provided address can be allocated using `mmap`.
  */
 HAILORTAPI hailo_status hailo_stream_write_raw_buffer_async(hailo_input_stream stream, const void *buffer, size_t size,
     hailo_stream_write_async_callback_t user_callback, void *opaque);

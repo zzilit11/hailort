@@ -26,8 +26,6 @@ if(NOT grpc_POPULATED)
                 -DCMAKE_BUILD_TYPE=${TOOL_BUILD_TYPE}
         
                 -DgRPC_BUILD_TESTS:BOOL=OFF
-                # TODO: check flag on Windows
-                # -DgRPC_BUILD_MSVC_MP_COUNT:STRING=-1
                 -DgRPC_PROTOBUF_PROVIDER:STRING=package
                 -DgRPC_PROTOBUF_PACKAGE_TYPE:STRING=CONFIG
                 -DProtobuf_DIR:PATH=${PROTOBUF_CONFIG_DIR}

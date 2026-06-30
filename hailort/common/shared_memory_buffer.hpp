@@ -23,11 +23,7 @@ namespace hailort
 #define SHARED_MEMORY_NAME_SEPERATOR '_'
 #define INVALID_SHARED_MEMORY_CHAR '/'
 
-#if defined(_MSC_VER)
-#define SHARED_MEMORY_NAME_PREFIX "Local\\"
-#else
 #define SHARED_MEMORY_NAME_PREFIX '/'
-#endif
 
 class SharedMemoryBuffer;
 using SharedMemoryBufferPtr = std::shared_ptr<SharedMemoryBuffer>;

@@ -11,13 +11,11 @@
 
 #include "md5.h"
 #include <fstream>
-#ifdef __linux__
 #include <glob.h>
 #ifdef GPIO_V2_GET_LINE_IOCTL
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #endif // GPIO_V2_GET_LINE_IOCTL
-#endif // __linux__
 #include <memory>
 
 namespace hailort
@@ -206,7 +204,7 @@ Expected<hailo_extended_device_information_t> IntegratedDevice::get_extended_dev
         CHECK_SUCCESS(status, "Failed to read {} bytes from file {}", sizeof(info.unit_level_tracking_id) - LOT_ID_SIZE, FUSE_FILE);
     }
 
-#if defined(__linux__) && defined(GPIO_V2_GET_LINE_IOCTL)
+#ifdef GPIO_V2_GET_LINE_IOCTL
     if (m_device_architecture == HAILO_ARCH_HAILO10H) {
         TRY(info.gpio_mask, GpioReader().read());
     }
@@ -218,7 +216,6 @@ Expected<hailo_extended_device_information_t> IntegratedDevice::get_extended_dev
 Expected<bool> IntegratedDevice::has_INA231()
 {
     bool has_INA231 = false;
-    #ifdef __linux__
     glob_t glob_result;
     constexpr auto SENSOR_NAME_FILE_PATHS = "/sys/class/hwmon/hwmon*/name";
     glob(SENSOR_NAME_FILE_PATHS, GLOB_TILDE, NULL, &glob_result);
@@ -237,11 +234,10 @@ Expected<bool> IntegratedDevice::has_INA231()
         }
     }
     globfree(&glob_result);
-    #endif // __linux__
     return has_INA231;
 }
 
-#if defined(__linux__) && defined(GPIO_V2_GET_LINE_IOCTL)
+#ifdef GPIO_V2_GET_LINE_IOCTL
 IntegratedDevice::GpioReader::~GpioReader()
 {
     if (m_request_fd >= 0) {
@@ -278,6 +274,6 @@ Expected<uint16_t> IntegratedDevice::GpioReader::read()
 
     return static_cast<uint16_t>(values.bits);
 }
-#endif // __linux__
+#endif // GPIO_V2_GET_LINE_IOCTL
 
 } /* namespace hailort */

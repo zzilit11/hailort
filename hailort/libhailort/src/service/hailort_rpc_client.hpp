@@ -16,20 +16,11 @@
 #include "rpc/rpc_definitions.hpp"
 #include "service/buffer_pool_per_stream.hpp"
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable: 4244 4267 4127)
-#else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
-#endif
 #include <grpcpp/grpcpp.h>
 #include "hailort_rpc.grpc.pb.h"
-#if defined(_MSC_VER)
-#pragma warning( pop )
-#else
 #pragma GCC diagnostic pop
-#endif
 #include <memory>
 
 namespace hailort

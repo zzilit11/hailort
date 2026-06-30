@@ -16,20 +16,11 @@
 #include <tuple>
 
 // https://github.com/protocolbuffers/protobuf/tree/master/cmake#notes-on-compiler-warnings
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable: 4244 4267 4127)
-#else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
 #include "rpc.pb.h"
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#else
 #pragma GCC diagnostic pop
-#endif
 
 namespace hailort
 {

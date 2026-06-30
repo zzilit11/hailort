@@ -56,8 +56,6 @@ dirent* Filesystem::DirWalker::next_file()
     return readdir(m_dir);
 }
 
-#if defined(__linux__)
-
 Expected<std::vector<std::string>> Filesystem::get_files_in_dir_flat(const std::string &dir_path)
 {
     const std::string dir_path_with_sep = has_suffix(dir_path, SEPARATOR) ? dir_path : dir_path + SEPARATOR;
@@ -76,17 +74,6 @@ Expected<std::vector<std::string>> Filesystem::get_files_in_dir_flat(const std::
 
     return files;
 }
-// QNX
-#elif defined(__QNX__)
-Expected<std::vector<std::string>> Filesystem::get_files_in_dir_flat(const std::string &dir_path)
-{
-    (void) dir_path;
-    return make_unexpected(HAILO_NOT_IMPLEMENTED);
-}
-// Unsupported Platform
-#else
-static_assert(false, "Unsupported Platform!");
-#endif
 
 Expected<time_t> Filesystem::get_file_modified_time(const std::string &file_path)
 {
@@ -96,8 +83,6 @@ Expected<time_t> Filesystem::get_file_modified_time(const std::string &file_path
     auto last_modification_time = attr.st_mtime;
     return last_modification_time;
 }
-
-#if defined(__linux__)
 
 Expected<std::vector<std::string>> Filesystem::get_latest_files_in_dir_flat(const std::string &dir_path,
     std::chrono::milliseconds time_interval)
@@ -126,20 +111,6 @@ Expected<std::vector<std::string>> Filesystem::get_latest_files_in_dir_flat(cons
 
     return files;
 }
-
-#elif defined(__QNX__)
-Expected<std::vector<std::string>> Filesystem::get_latest_files_in_dir_flat(const std::string &dir_path,
-    std::chrono::milliseconds time_interval)
-{
-    // TODO: HRT-7643
-    (void)dir_path;
-    (void)time_interval;
-    return make_unexpected(HAILO_NOT_IMPLEMENTED);
-}
-// Unsupported Platform
-#else
-static_assert(false, "Unsupported Platform!");
-#endif // __linux__
 
 Expected<bool> Filesystem::is_directory(const std::string &path)
 {
@@ -184,14 +155,6 @@ std::string Filesystem::get_home_directory()
     if (NULL == homedir) {
         homedir = getpwuid(getuid())->pw_dir;
     }
-
-#ifdef __QNX__
-    const std::string root_dir = "/";
-    std::string homedir_str = std::string(homedir);
-    if (homedir_str == root_dir) {
-        return homedir_str + "home";
-    }
-#endif
 
     return homedir;
 }

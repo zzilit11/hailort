@@ -17,18 +17,11 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/android_sink.h>
 #include <spdlog/sinks/null_sink.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <iomanip>
-#ifdef _WIN32
-#include <shlwapi.h>
-#include <shlobj.h>
-#endif
-
-
 namespace hailort
 {
 
@@ -45,8 +38,6 @@ namespace hailort
 #endif
 #define HAILORT_MAIN_FILE_LOGGER_PATTERN ("[%Y-%m-%d %X.%e] [%P] [%t] [%n] [%l] [%s:%#] [%!] %v") // File logger will print: [timestamp] [PID] [TID] [hailort] [log level] [source file:line number] [function name] msg
 #define HAILORT_LOCAL_FILE_LOGGER_PATTERN ("[%Y-%m-%d %X.%e] [%t] [%n] [%l] [%s:%#] [%!] %v") // File logger will print: [timestamp] [TID] [hailort] [log level] [source file:line number] [function name] msg
-#define HAILORT_ANDROID_LOGGER_PATTERN ("%v")               // Android logger will print only message (additional info are built-in)
-
 #define PERIODIC_FLUSH_INTERVAL_IN_SECONDS (5)
 
 
@@ -78,45 +69,8 @@ std::string HailoRTLogger::get_main_log_path()
         return "";
     }
 
-#ifdef _WIN32
-    // See https://stackoverflow.com/questions/2899013/how-do-i-get-the-application-data-path-in-windows-using-c
-    TCHAR local_app_data_path[MAX_PATH];
-    auto result = SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, local_app_data_path);
-    if (!SUCCEEDED(result)) {
-        std::cerr << "Cannot resolve Local Application Data directory path" << std::endl;
-        return "";
-    }
-    
-    const auto hailo_dir_path = std::string(local_app_data_path) + PATH_SEPARATOR + "Hailo";
-    const auto full_path = hailo_dir_path + PATH_SEPARATOR + "HailoRT";
-
-#ifdef HAILO_SUPPORT_MULTI_PROCESS
-    TCHAR program_data_path[MAX_PATH];
-    auto ret_val = SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA, NULL, 0, program_data_path);
-    if (!SUCCEEDED(ret_val)) {
-        std::cerr << "Cannot resolve ProgramData directory path" << std::endl;
-        return "";
-    }
-
-    const auto hailort_service_dir_path = std::string(program_data_path) + PATH_SEPARATOR + "HailoRT_Service";
-    auto create_status = Filesystem::create_directory(hailort_service_dir_path);
-    if (HAILO_SUCCESS != create_status) {
-        std::cerr << "Cannot create directory at path " << hailort_service_dir_path << std::endl;
-        return "";
-    }
-
-    const auto hailort_service_full_path = std::string(program_data_path) + PATH_SEPARATOR + "HailoRT_Service" + PATH_SEPARATOR + "logs";
-    create_status = Filesystem::create_directory(hailort_service_full_path);
-    if (HAILO_SUCCESS != create_status) {
-        std::cerr << "Cannot create directory at path " << hailort_service_full_path << std::endl;
-        return "";
-    }
-#endif
-
-#else
     const auto hailo_dir_path = Filesystem::get_home_directory() + PATH_SEPARATOR + ".hailo";
     const auto full_path = hailo_dir_path + PATH_SEPARATOR + "hailort";
-#endif
 
     auto status = Filesystem::create_directory(hailo_dir_path);
     if (HAILO_SUCCESS != status) {
@@ -172,25 +126,16 @@ std::shared_ptr<spdlog::sinks::sink> HailoRTLogger::create_file_sink(const std::
 
 HailoRTLogger::HailoRTLogger(spdlog::level::level_enum console_level, spdlog::level::level_enum file_level, spdlog::level::level_enum flush_level) :
     m_console_sink(make_shared_nothrow<spdlog::sinks::stderr_color_sink_mt>()),
-#ifdef __ANDROID__
-    m_main_log_file_sink(make_shared_nothrow<spdlog::sinks::android_sink_mt>(HAILORT_NAME)),
-    m_local_log_file_sink(make_shared_nothrow<spdlog::sinks::null_sink_mt>())
-#else
     m_main_log_file_sink(create_file_sink(get_main_log_path(), HAILORT_LOGGER_FILENAME, true)),
     m_local_log_file_sink(create_file_sink(get_log_path(HAILORT_LOGGER_PATH_ENV_VAR), HAILORT_LOGGER_FILENAME, true))
-#endif
 {
     if ((nullptr == m_console_sink) || (nullptr == m_main_log_file_sink) || (nullptr == m_local_log_file_sink)) {
         std::cerr << "Allocating memory on heap for logger sinks has failed! Please check if this host has enough memory. Writing to log will result in a SEGFAULT!" << std::endl;
         return;
     }
 
-#ifdef __ANDROID__
-    m_main_log_file_sink->set_pattern(HAILORT_ANDROID_LOGGER_PATTERN);
-#else
     m_main_log_file_sink->set_pattern(HAILORT_MAIN_FILE_LOGGER_PATTERN);
     m_local_log_file_sink->set_pattern(HAILORT_LOCAL_FILE_LOGGER_PATTERN);
-#endif
 
     m_console_sink->set_pattern(HAILORT_CONSOLE_LOGGER_PATTERN);
     spdlog::sinks_init_list sink_list = { m_console_sink, m_main_log_file_sink, m_local_log_file_sink };

@@ -17,14 +17,9 @@
 #include <map>
 #include <assert.h>
 
-#ifndef _MSC_VER
 #include <sys/mman.h>
-#endif
 
-#ifndef _MSC_VER
-// Windows did the right choice - not supporting fork() at all, so we don't support it either.
 #define HAILO_IS_FORK_SUPPORTED
-#endif
 
 
 namespace hailort

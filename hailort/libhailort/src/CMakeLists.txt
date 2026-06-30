@@ -68,19 +68,14 @@ SET_SOURCE_FILES_PROPERTIES(${C_SOURCES} PROPERTIES LANGUAGE CXX)
 add_library(libhailort SHARED ${HAILORT_SRCS_ABS})
 
 # Include libraries
-if(WIN32)
-    set_property(TARGET libhailort PROPERTY
-        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-else()
-    target_link_libraries(libhailort PRIVATE
-        m # libmath
-        atomic
-    )
+target_link_libraries(libhailort PRIVATE
+    m # libmath
+    atomic
+)
 
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-    # Hack to support cross-compilation - https://stackoverflow.com/a/49086560
-    set(THREADS_PTHREAD_ARG "0" CACHE STRING "Result from TRY_RUN" FORCE)
-endif()
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+# Hack to support cross-compilation - https://stackoverflow.com/a/49086560
+set(THREADS_PTHREAD_ARG "0" CACHE STRING "Result from TRY_RUN" FORCE)
 
 target_link_libraries(libhailort PRIVATE Threads::Threads)
 target_link_libraries(libhailort PRIVATE hef_proto)
@@ -93,10 +88,6 @@ target_link_libraries(libhailort PRIVATE rpc_proto)
 if(HAILO_BUILD_SERVICE)
     target_link_libraries(libhailort PRIVATE grpc++_unsecure)
     target_link_libraries(libhailort PRIVATE hailort_rpc_grpc_proto)
-endif()
-
-if(CMAKE_SYSTEM_NAME STREQUAL QNX)
-    target_link_libraries(libhailort PRIVATE pci)
 endif()
 
 set(HAILORT_PUBLIC_HEADERS
@@ -180,9 +171,7 @@ install(TARGETS libhailort
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    install(CODE "execute_process(COMMAND ldconfig)")
-endif()
+install(CODE "execute_process(COMMAND ldconfig)")
 
 # Export libhailort
 set(CMAKE_SCRIPTS_DIR ${CMAKE_CURRENT_BINARY_DIR})

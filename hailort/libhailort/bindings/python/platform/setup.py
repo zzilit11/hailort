@@ -27,7 +27,7 @@ class install_lib(orig_install_lib):
         outfiles = super().install()
 
         arch = re.sub(_plat_name, "linux[_-]", "")  # remove linux prefix as the extension architecture does not include it
-        extension = "pyd" if os.name == "nt" else "so"
+        extension = "so"
         py_version = f"{sys.version_info.major}{sys.version_info.minor}"
         lib_regex = f"_pyhailort*{py_version}*{arch}*.{extension}"
         dst = os.path.join(self.install_dir, "hailo_platform", "pyhailort")

@@ -341,8 +341,7 @@ private:
     // to force free the network group before freeing the device/vdevice.
     std::weak_ptr<ConfiguredNetworkGroup> m_cng;
 
-    // On multi-process, when pickling this object (the windows multi-process flow) the device/vdevice
-    // doesn't own the network group object.
+    // On multi-process, when pickling this object, the device/vdevice doesn't own the network group object.
     // To solve this problem, we store here and optional guard for the network group that will exist
     // only when the object is constructed with pickle.
     std::shared_ptr<ConfiguredNetworkGroup> m_cng_guard_for_mt;

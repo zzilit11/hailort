@@ -35,11 +35,7 @@ using namespace hailort;
 #define HAILONET_ERROR(msg, ...) g_print("HailoNet Error: " msg, ##__VA_ARGS__)
 #define PLUGIN_AUTHOR "Hailo Technologies Ltd. (\"Hailo\")"
 
-#ifdef _MSC_VER
-    #define MAX_STRING_SIZE (MAX_PATH)
-#else
-    #define MAX_STRING_SIZE (PATH_MAX)
-#endif
+#define MAX_STRING_SIZE (PATH_MAX)
 
 #define MAX_QUEUED_BUFFERS_IN_INPUT (16)
 #define MAX_QUEUED_BUFFERS_IN_OUTPUT (16)

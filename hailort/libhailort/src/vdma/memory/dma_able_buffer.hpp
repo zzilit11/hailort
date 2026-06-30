@@ -7,12 +7,10 @@
  * @brief A Buffer that can be mapped to some device for dma operations.
  *        There are several options for that buffer:
  *          1. No allocation - The user gives its own buffer pointer and address. The buffer must be page aligned.
- *          2. Normal allocation - page aligned allocation. This is the default option for linux and windows.
+ *          2. Normal allocation - page aligned allocation.
  *          3. Driver allocation - On some platforms, default user mode memory allocation is not DMAAble. To overcome
  *             this, we allocate the buffer in a low memory using hailort driver. We check it querying
  *             HailoRTDriver::allocate_driver_buffer().
- *          4. QNX shared memory allocation - for qnx, in order to pass the driver to the resources manager, we need to
- *             create a shared memory object, and pass an handle to it in the mapping. TODO: HRT-10298 implement this.
  **/
 
 #ifndef _HAILO_DMA_ABLE_BUFFER_HPP_

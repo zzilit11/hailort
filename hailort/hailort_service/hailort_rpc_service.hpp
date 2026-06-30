@@ -10,21 +10,12 @@
 #ifndef HAILO_HAILORT_RPC_SERVICE_HPP_
 #define HAILO_HAILORT_RPC_SERVICE_HPP_
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable: 4244 4267 4127)
-#else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
 #include <grpcpp/grpcpp.h>
 #include "hailort_rpc.grpc.pb.h"
-#if defined(_MSC_VER)
-#pragma warning( pop ) 
-#else
 #pragma GCC diagnostic pop
-#endif
 
 #include "hailo/hailort.h"
 #include "hailo/network_group.hpp"

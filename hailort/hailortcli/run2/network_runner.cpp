@@ -16,10 +16,6 @@
 
 #include "network_runner.hpp"
 
-#if defined(_MSC_VER)
-#include <mmsystem.h>
-#endif
-
 using namespace hailort;
 
 SignalEventScopeGuard::SignalEventScopeGuard(Event &event) :
@@ -41,24 +37,6 @@ BarrierTerminateScopeGuard::~BarrierTerminateScopeGuard()
         m_barrier->terminate();
     }
 }
-
-#if defined(_MSC_VER) 
-class TimeBeginScopeGuard final
-{
-public:
-    TimeBeginScopeGuard() {
-        // default interval between timer interrupts on Windows is 15.625 ms.
-        // This will change it to be 1 ms, enabling us to sleep in granularity of 1 milliseconds.
-        // As from Windows 10 2004, in general processes are no longer affected by other processes calling timeBeginPeriod.
-        // https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
-        timeBeginPeriod(1);
-    }
-    ~TimeBeginScopeGuard() {
-        timeEndPeriod(1);
-    }
-};
-#endif
-
 
 //TODO: duplicated
 hailo_status NetworkRunner::wait_for_threads(std::vector<AsyncThreadPtr<hailo_status>> &threads)
@@ -345,10 +323,6 @@ hailo_status NetworkRunner::run(EventPtr shutdown_event, LiveStats &live_stats, 
     const auto measure_fps = !m_params.measure_hw_latency && !m_params.measure_overall_latency;
     auto net_live_track = std::make_shared<NetworkLiveTrack>(m_name, m_cng, m_configured_infer_model, m_overall_latency_meter, measure_fps, m_params.hef_path);
     live_stats.add(net_live_track, 1); //support progress over multiple outputs
-
-#if defined(_MSC_VER)
-    TimeBeginScopeGuard time_begin_scope_guard;
-#endif
 
     activation_barrier.arrive_and_wait();
 

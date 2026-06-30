@@ -16,33 +16,14 @@
 #include <memory>
 #include <vector>
 #include <chrono>
-#if defined(__GNUC__)
 #include <poll.h>
-#endif
-
-#if defined(__QNX__)
-#include <atomic>
-#include <mutex>
-
-
-// Forward declare neosmart::neosmart_event_t_
-namespace neosmart {
-    struct neosmart_event_t_;
-}
-#endif // defined (__QNX__)
 
 /** hailort namespace */
 namespace hailort
 {
 
 // underlying_waitable_handle_t
-#if defined(_MSC_VER) || defined(__linux__)
-    typedef underlying_handle_t underlying_waitable_handle_t; 
-#elif defined(__QNX__)
-    typedef neosmart::neosmart_event_t_* underlying_waitable_handle_t;
-#else
-    #error "Unsupported Platform"
-#endif
+typedef underlying_handle_t underlying_waitable_handle_t;
 
 
 class Waitable;
@@ -75,13 +56,11 @@ protected:
 
     static hailo_status wait_for_single_object(underlying_waitable_handle_t handle, std::chrono::milliseconds timeout);
 
-#if defined(__linux__)
     // Waits on the fd until the waitable is signaled
     static hailo_status eventfd_poll(underlying_waitable_handle_t fd, std::chrono::milliseconds timeout);
     // Expected to be called after eventfd_poll returns HAILO_SUCCESS
     static hailo_status eventfd_read(underlying_waitable_handle_t fd);
     static hailo_status eventfd_write(underlying_waitable_handle_t fd);
-#endif
 
     underlying_waitable_handle_t m_handle;
 
@@ -134,21 +113,11 @@ public:
     virtual hailo_status signal() override;
     virtual bool is_auto_reset() override;
 
-#if defined(__QNX__)
-    Semaphore(underlying_waitable_handle_t handle, uint32_t initial_count);
-    Semaphore(Semaphore&& other);
-
-#endif // defined (__QNX__)
-
 protected:
     virtual hailo_status post_wait() override;
 
 private:
     static underlying_waitable_handle_t open_semaphore_handle(uint32_t initial_count);
-#if defined (__QNX__)
-    std::atomic<unsigned int> m_count;
-    std::mutex m_sem_mutex;
-#endif // defined(__QNX__)
 };
 
 } /* namespace hailort */

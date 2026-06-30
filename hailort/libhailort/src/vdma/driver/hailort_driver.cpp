@@ -15,16 +15,7 @@
 #include "common/utils.hpp"
 #include "hailo_ioctl_common.h"
 
-#if defined(__linux__)
 #include <sys/mman.h>
-#elif defined(__QNX__)
-#include <fcntl.h>
-#include <sys/mman.h>
-#elif defined(_WIN32)
-#pragma comment(lib, "cfgmgr32.lib")
-#else
-#error "unsupported platform!"
-#endif
 
 namespace hailort
 {
@@ -116,13 +107,7 @@ const uintptr_t HailoRTDriver::INVALID_DRIVER_BUFFER_HANDLE_VALUE = INVALID_DRIV
 const size_t HailoRTDriver::INVALID_DRIVER_VDMA_MAPPING_HANDLE_VALUE = INVALID_DRIVER_HANDLE_VALUE;
 const uint8_t HailoRTDriver::INVALID_VDMA_CHANNEL_INDEX = INVALID_VDMA_CHANNEL;
 
-#if defined(__linux__) || defined(_WIN32)
 const vdma_mapped_buffer_driver_identifier HailoRTDriver::INVALID_MAPPED_BUFFER_DRIVER_IDENTIFIER = INVALID_DRIVER_HANDLE_VALUE;
-#elif __QNX__
-const vdma_mapped_buffer_driver_identifier HailoRTDriver::INVALID_MAPPED_BUFFER_DRIVER_IDENTIFIER = -1;
-#else
-#error "unsupported platform!"
-#endif
 
 Expected<std::unique_ptr<HailoRTDriver>> HailoRTDriver::create(const std::string &device_id, const std::string &dev_path)
 {
@@ -158,12 +143,7 @@ Expected<std::unique_ptr<HailoRTDriver>> HailoRTDriver::create_integrated_nnc()
 
 bool HailoRTDriver::is_integrated_nnc_loaded()
 {
-#if defined(_MSC_VER)
-    // windows is not supported for integrated_nnc driver
-    return false;
-#else
     return (access(INTEGRATED_NNC_DRIVER_PATH.c_str(), F_OK) == 0);
-#endif // defined(_MSC_VER)
 }
 
 Expected<std::unique_ptr<HailoRTDriver>> HailoRTDriver::create_pcie_ep()
@@ -173,12 +153,7 @@ Expected<std::unique_ptr<HailoRTDriver>> HailoRTDriver::create_pcie_ep()
 
 bool HailoRTDriver::is_pcie_ep_loaded()
 {
-#if defined(_MSC_VER)
-    // windows is not supported for pcie_ep driver
-    return false;
-#else
     return (access(PCIE_EP_DRIVER_PATH.c_str(), F_OK) == 0);
-#endif // defined(_MSC_VER)
 }
 
 static hailo_status validate_driver_version(const hailo_driver_info &driver_info)
@@ -246,10 +221,6 @@ HailoRTDriver::HailoRTDriver(const std::string &device_id, FileDescriptor &&fd, 
     }
 
     m_is_fw_loaded = device_properties.is_fw_loaded;
-
-#ifdef __QNX__
-    m_resource_manager_pid = device_properties.resource_manager_pid;
-#endif // __QNX__
 
     status = HAILO_SUCCESS;
 }
@@ -556,7 +527,6 @@ hailo_status HailoRTDriver::vdma_buffer_unmap(uintptr_t user_address, size_t siz
 hailo_status HailoRTDriver::vdma_buffer_sync(VdmaBufferHandle handle, DmaSyncDirection sync_direction,
     size_t offset, size_t count)
 {
-#ifndef __QNX__
     hailo_vdma_buffer_sync_params sync_info{};
     sync_info.handle = handle;
     sync_info.sync_type = (sync_direction == DmaSyncDirection::TO_HOST) ? HAILO_SYNC_FOR_CPU : HAILO_SYNC_FOR_DEVICE;
@@ -564,14 +534,6 @@ hailo_status HailoRTDriver::vdma_buffer_sync(VdmaBufferHandle handle, DmaSyncDir
     sync_info.count = count;
     RUN_AND_CHECK_IOCTL_RESULT(HAILO_VDMA_BUFFER_SYNC, &sync_info, "Failed sync vdma buffer");
     return HAILO_SUCCESS;
-// TODO: HRT-6717 - Remove ifdef when Implement sync ioctl (if determined needed in qnx)
-#else /*  __QNX__ */
-    (void) handle;
-    (void) sync_direction;
-    (void) offset;
-    (void) count;
-    return HAILO_SUCCESS;
-#endif
 }
 
 hailo_status HailoRTDriver::descriptors_list_program(uintptr_t desc_handle, VdmaBufferHandle buffer_handle,
@@ -636,7 +598,6 @@ hailo_status HailoRTDriver::launch_transfer(vdma::ChannelId channel_id, uintptr_
     return HAILO_SUCCESS;
 }
 
-#if defined(__linux__)
 Expected<uintptr_t> HailoRTDriver::vdma_low_memory_buffer_alloc(size_t size)
 {
     hailo_allocate_low_memory_buffer_params params{};
@@ -699,35 +660,6 @@ hailo_status HailoRTDriver::vdma_continuous_buffer_free(const ContinousBufferInf
 
     return status;
 }
-#elif defined(__QNX__) || defined(_WIN32)
-
-Expected<uintptr_t> HailoRTDriver::vdma_low_memory_buffer_alloc(size_t /* size */)
-{
-    LOGGER__ERROR("Low memory buffer not supported for platform");
-    return make_unexpected(HAILO_NOT_SUPPORTED);
-}
-
-hailo_status HailoRTDriver::vdma_low_memory_buffer_free(uintptr_t /* buffer_handle */)
-{
-    LOGGER__ERROR("Low memory buffer not supported for platform");
-    return make_unexpected(HAILO_NOT_SUPPORTED);
-}
-
-Expected<ContinousBufferInfo> HailoRTDriver::vdma_continuous_buffer_alloc(size_t /* size */)
-{
-    LOGGER__ERROR("Continous buffer not supported for platform");
-    return make_unexpected(HAILO_NOT_SUPPORTED);
-}
-
-hailo_status HailoRTDriver::vdma_continuous_buffer_free(const ContinousBufferInfo &/* buffer_info */)
-{
-    LOGGER__ERROR("Continous buffer not supported for platform");
-    return HAILO_NOT_SUPPORTED;
-}
-
-#else
-#error "unsupported platform!"
-#endif
 
 hailo_status HailoRTDriver::mark_as_used()
 {
@@ -783,7 +715,6 @@ hailo_status HailoRTDriver::close_connection(vdma::ChannelId input_channel, vdma
     }
 }
 
-#if defined(__linux__)
 static bool is_blocking_ioctl(unsigned long request)
 {
     switch (request) {
@@ -808,22 +739,7 @@ int HailoRTDriver::run_ioctl(uint32_t ioctl_code, PointerType param)
 
     return run_hailo_ioctl(m_fd, ioctl_code, param);
 }
-#elif defined(__QNX__) || defined(_WIN32)
 
-template<typename PointerType>
-int HailoRTDriver::run_ioctl(uint32_t ioctl_code, PointerType param)
-{
-    return run_hailo_ioctl(m_fd, ioctl_code, param);
-}
-#else
-#error "Unsupported platform"
-#endif
-
-
-
-
-
-#if defined(__linux__) || defined(_WIN32)
 Expected<HailoRTDriver::VdmaBufferHandle> HailoRTDriver::vdma_buffer_map_ioctl(uintptr_t user_address, size_t required_size,
     DmaDirection data_direction, const vdma_mapped_buffer_driver_identifier &driver_buff_handle,
     DmaBufferType buffer_type)
@@ -840,49 +756,6 @@ Expected<HailoRTDriver::VdmaBufferHandle> HailoRTDriver::vdma_buffer_map_ioctl(u
 
     return std::move(map_user_buffer_info.mapped_handle);
 }
-#elif defined(__QNX__)
-Expected<HailoRTDriver::VdmaBufferHandle> HailoRTDriver::vdma_buffer_map_ioctl(uintptr_t user_address, size_t required_size,
-    DmaDirection data_direction, const vdma_mapped_buffer_driver_identifier &driver_buff_handle,
-    DmaBufferType buffer_type)
-{
-    // Mapping is done by the driver_buff_handle (shm file descriptor), and not by address.
-    (void)user_address;
-    CHECK(driver_buff_handle != INVALID_MAPPED_BUFFER_DRIVER_IDENTIFIER, HAILO_NOT_SUPPORTED,
-        "On QNX only shared-memory buffers are allowed to be mapped");
-
-    // Create shared memory handle to send to driver
-    shm_handle_t shm_handle;
-    int err = shm_create_handle(driver_buff_handle, m_resource_manager_pid, O_RDWR,
-        &shm_handle, 0);
-    if (0 != err) {
-        LOGGER__ERROR("Error creating shm object handle, errno is: {}", errno);
-        return make_unexpected(HAILO_INTERNAL_FAILURE);
-    }
-
-    hailo_vdma_buffer_map_params map_user_buffer_info {
-        .shared_memory_handle = shm_handle,
-        .size = required_size,
-        .data_direction = direction_to_dma_data_direction(data_direction),
-        .buffer_type = driver_dma_buffer_type_to_dma_buffer_type(buffer_type),
-        .allocated_buffer_handle = INVALID_DRIVER_HANDLE_VALUE,
-        .mapped_handle = 0
-    };
-
-    // Note: The driver will accept the shm_handle, and will mmap it to its own address space. After the driver maps the
-    // the shm, calling shm_delete_handle is not needed (but can't harm on the otherhand).
-    // If the ioctl fails, we can't tell if the shm was mapped or not, so we delete it ourself.
-    auto status = RUN_IOCTL(HAILO_VDMA_BUFFER_MAP, &map_user_buffer_info);
-    if (HAILO_SUCCESS != status) {
-        LOGGER__ERROR("Failed to map user buffer with {}", status);
-        shm_delete_handle(shm_handle);
-        return make_unexpected(status);
-    }
-
-    return VdmaBufferHandle(map_user_buffer_info.mapped_handle);
-}
-#else
-#error "unsupported platform!"
-#endif // __linux__
 
 hailo_status HailoRTDriver::vdma_buffer_unmap_ioctl(VdmaBufferHandle handle)
 {
@@ -914,8 +787,6 @@ hailo_status HailoRTDriver::descriptors_list_release(desc_list_handle_t handle)
     RUN_AND_CHECK_IOCTL_RESULT(HAILO_DESC_LIST_RELEASE, &params, "Failed release desc list");
     return HAILO_SUCCESS;
 }
-
-#if defined(__linux__)
 
 Expected<std::pair<uintptr_t, uint64_t>> HailoRTDriver::continous_buffer_alloc_ioctl(size_t size)
 {
@@ -964,8 +835,6 @@ hailo_status HailoRTDriver::continous_buffer_munmap(void *address, size_t size)
     }
     return HAILO_SUCCESS;
 }
-
-#endif
 
 bool HailoRTDriver::is_valid_channel_id(const vdma::ChannelId &channel_id)
 {

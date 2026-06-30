@@ -12,13 +12,7 @@ option(HAILO_SUPPORT_PACKAGING "Create HailoRT package (internal)" OFF)
 option(HAILO_BUILD_DOC "Build doc" OFF)
 
 if (HAILO_COMPILE_WARNING_AS_ERROR)
-    if(WIN32)
-        set(HAILORT_COMPILE_OPTIONS ${HAILORT_COMPILE_OPTIONS} /WX)
-    elseif(UNIX)
-        set(HAILORT_COMPILE_OPTIONS ${HAILORT_COMPILE_OPTIONS} -Werror)
-    else()
-        message(FATAL_ERROR "Unexpeced host, stopping build")
-    endif()
+    set(HAILORT_COMPILE_OPTIONS ${HAILORT_COMPILE_OPTIONS} -Werror)
 endif()
 
 # Flag for emulator (FPGA/Veloce)
@@ -77,15 +71,6 @@ if(HAILO_BUILD_SERVICE)
     add_subdirectory(hailort_service)
 endif()
 
-if(HAILO_WIN_DRIVER)
-    add_subdirectory(drivers/win)
-endif()
-
 if(HAILO_SUPPORT_PACKAGING)
     add_subdirectory(packaging)
-endif()
-
-# Compile PCIe Driver if QNX
-if(CMAKE_SYSTEM_NAME STREQUAL QNX)
-    add_subdirectory(drivers/qnx)
 endif()

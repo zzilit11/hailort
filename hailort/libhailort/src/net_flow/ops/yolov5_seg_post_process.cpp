@@ -12,15 +12,11 @@
 
 #include "transform/eigen.hpp"
 
-#ifndef _MSC_VER
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
-#endif // Not MSC
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
-#ifndef _MSC_VER
 #pragma GCC diagnostic pop
-#endif // Not MSC
 
 namespace hailort
 {

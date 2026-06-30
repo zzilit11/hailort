@@ -92,7 +92,6 @@ void SchedulerProfilerHandler::handle_trace(const InitProfilerProtoTrace &trace)
     ProfilerTime curr_time = get_curr_time();
 
     auto init = m_profiler_trace_proto.mutable_top_header();
-    #if defined(__linux__)
     init->set_os_name(os_name());
     init->set_os_ver(os_ver());
     init->set_cpu_arch(cpu_arch());
@@ -105,7 +104,6 @@ void SchedulerProfilerHandler::handle_trace(const InitProfilerProtoTrace &trace)
         init->mutable_pcie_info()->set_gen("Failed fetching info, root privilege is required");
         init->mutable_pcie_info()->set_lanes("Failed fetching info, root privilege is required");
     }
-    #endif
     init->set_hailort_ver(get_libhailort_version_representation());
     init->mutable_time()->set_day(curr_time.day);
     init->mutable_time()->set_month(curr_time.month);

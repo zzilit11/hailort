@@ -49,12 +49,7 @@ MonCommand::MonCommand(CLI::App &parent_app) :
 
 hailo_status MonCommand::execute()
 {
-#ifdef _WIN32
-    LOGGER__ERROR("hailortcli `monitor` command is not supported on Windows");
-    return HAILO_NOT_IMPLEMENTED;
-#else
     return run_monitor();
-#endif
 }
 
 void MonCommand::add_devices_info_header(std::ostream &buffer)
@@ -291,4 +286,3 @@ hailo_status MonCommand::run_monitor()
 #endif
 
 } /* namespace hailort */
-

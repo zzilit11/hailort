@@ -72,10 +72,6 @@ namespace hailort
 /* Forces flush of the logger to file on every trace, instead of the default (warnings and above) */
 #define HAILORT_LOGGER_FLUSH_EVERY_PRINT_ENV_VAR ("HAILORT_LOGGER_FLUSH_EVERY_PRINT")
 
-/* Force QNX Driver logs to be flushed to specific file - or if left undefined - to stderr */
-#define HAILO_QNX_DRIVER_LOG_STDERR_ENV_VAR ("HAILO_QNX_DRIVER_LOG_STDERR")
-
-
 /* Inference */
 
 /* Disables the hrt-multiplexer */

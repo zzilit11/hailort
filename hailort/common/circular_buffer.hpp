@@ -20,13 +20,8 @@
 namespace hailort
 {
 
-#ifdef _WIN32
-#define _CB_FETCH(x) (InterlockedOr((LONG volatile*)(&x), (LONG)0))
-#define _CB_SET(x, value) (InterlockedExchange((LONG volatile*)(&x), (LONG)(value)))
-#else
 #define _CB_FETCH(x) (__sync_fetch_and_or(const_cast<volatile int*>(&(x)), 0))
 #define _CB_SET(x, value) ((void)__sync_lock_test_and_set(&(x), value))
-#endif
 
 // Note: We use tag dispatching to select the right implementation for power of 2 size
 //       There's a minor performance gain for power of 2 size, as we can use a mask instead of modulo
