@@ -47,9 +47,8 @@ def init_plat_name():
 
 
 def get_arch(plat_name):
-    """Find the architecture from the platform name or environment variables, or use the native one."""
-    os_name = platform.system().lower()
-    arch = re.sub(f"{os_name}[-_]" or "", "", plat_name)
+    """Find the architecture from a Linux platform name."""
+    arch = re.sub(r"linux[-_]", "", plat_name)
     return arch
 
 
@@ -105,7 +104,7 @@ class install_lib(orig_install_lib):
 
         arch = get_arch(_plat_name)
         py_str = _PY_VERSION.replace(".", "")
-        extension = "pyd" if os.name == "nt" else "so"
+        extension = "so"
         current_dir = Path(__file__).parent.absolute()
         dst = os.path.join(self.install_dir, "hailo_platform", "pyhailort")
 
@@ -161,12 +160,14 @@ class build_ext(orig_build_ext):
 
                 # the dir name will be <os>.<arch>.<build_type>. extract the arch part
                 os_name, arch_name = [s.lower() for s in dir_name.split(".")[:2]]
+                if os_name != "linux":
+                    raise ValueError(f"HailoRT supports Linux only, got platform '{os_name}'")
                 _logger.info(
                     f"inferred plat_name from LIBHAILORT_PATH ({dir_name} -> os={os_name}, arch={arch_name})"
                 )
             else:
                 os_name, arch_name = (
-                    platform.system().lower(),
+                    "linux",
                     platform.machine().lower(),
                 )
                 _logger.warning(

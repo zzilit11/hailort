@@ -22,13 +22,7 @@ set(HAILORT_COMMON_CPP_SOURCES
 add_subdirectory(genai/serializer)
 set(GENAI_SCHEME_CPP_SOURCES ${GENAI_SCHEME_CPP_SOURCES} PARENT_SCOPE)
 
-if(WIN32)
-    add_subdirectory(os/windows)
-elseif(UNIX)
-    add_subdirectory(os/posix)
-else()
-    message(FATAL_ERROR "Unexpeced host, stopping build")
-endif()
+add_subdirectory(os/posix)
 
 # Create static library hailort_common
 add_library(hailort_common STATIC ${HAILORT_COMMON_CPP_SOURCES})
@@ -46,11 +40,6 @@ target_link_libraries(hailort_common
     xxhash
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL QNX)
-    include(${HAILO_EXTERNALS_CMAKE_SCRIPTS}/pevents.cmake)
-    target_link_libraries(hailort_common PRIVATE pevents pci)
-endif()
-
 set_target_properties(hailort_common PROPERTIES
     CXX_STANDARD              17
     CXX_STANDARD_REQUIRED     YES
@@ -63,15 +52,6 @@ disable_exceptions(hailort_common)
 exclude_archive_libs_symbols(hailort_common)
 
 
-if(WIN32)
-    target_link_libraries(hailort_common PRIVATE
-        Ws2_32                  # Winsock2 API
-        Iphlpapi                # IP Helper API (i.e GetIpNetTable)
-        Shlwapi                 # Shell API (i.e PathIsDirectoryA)
-    )
-elseif(NOT CMAKE_SYSTEM_NAME STREQUAL Android)
-    # TODO: HRT-14770 fix android build
-    target_link_libraries(hailort_common PRIVATE
-        rt                       # Used for shm api (i.e shm_open)
-    )
-endif()
+target_link_libraries(hailort_common PRIVATE
+    rt                       # Used for shm api (i.e shm_open)
+)

@@ -187,9 +187,7 @@ public:
         add_subcommand<PowerMeasurementSubcommand>();
         add_subcommand<BoardConfigCommand>(OptionVisibility::HIDDEN);
         add_subcommand<MonCommand>();
-#if defined(__GNUC__)
         add_subcommand<HwInferEstimatorCommand>(OptionVisibility::HIDDEN);
-#endif
         add_subcommand<ParseHefCommand>();
         add_subcommand<MemoryRequirementsCommand>(OptionVisibility::HIDDEN);
         add_subcommand<FwControlCommand>();

@@ -16,16 +16,7 @@
 #include "common/utils.hpp"
 #include "hailo_ioctl_common.h"
 
-#if defined(__linux__)
 #include <sys/mman.h>
-#elif defined(__QNX__)
-#include <fcntl.h>
-#include <sys/mman.h>
-#elif defined(_WIN32)
-#pragma comment(lib, "cfgmgr32.lib")
-#else
-#error "unsupported platform!"
-#endif
 
 namespace hailort
 {
@@ -161,12 +152,7 @@ Expected<std::unique_ptr<HailoRTDriver>> HailoRTDriver::create_integrated_nnc()
 
 bool HailoRTDriver::is_integrated_nnc_loaded()
 {
-#if defined(_MSC_VER)
-    // windows is not supported for integrated_nnc driver
-    return false;
-#else
     return (access(INTEGRATED_NNC_DRIVER_PATH.c_str(), F_OK) == 0);
-#endif // defined(_MSC_VER)
 }
 
 Expected<std::unique_ptr<HailoRTDriver>> HailoRTDriver::create_pcie_ep()
@@ -176,12 +162,7 @@ Expected<std::unique_ptr<HailoRTDriver>> HailoRTDriver::create_pcie_ep()
 
 bool HailoRTDriver::is_pcie_ep_loaded()
 {
-#if defined(_MSC_VER)
-    // windows is not supported for pcie_ep driver
-    return false;
-#else
     return (access(PCIE_EP_DRIVER_PATH.c_str(), F_OK) == 0);
-#endif // defined(_MSC_VER)
 }
 
 static hailo_status validate_driver_version(const hailo_driver_info &driver_info)
@@ -247,10 +228,6 @@ HailoRTDriver::HailoRTDriver(const std::string &device_id, FileDescriptor &&fd, 
     }
 
     m_is_fw_loaded = device_properties.is_fw_loaded;
-
-#ifdef __QNX__
-    m_resource_manager_pid = device_properties.resource_manager_pid;
-#endif // __QNX__
 
     status = HAILO_SUCCESS;
 }
@@ -473,7 +450,6 @@ hailo_status HailoRTDriver::vdma_buffer_unmap(uintptr_t addr_or_fd, size_t size,
 hailo_status HailoRTDriver::vdma_buffer_sync(VdmaBufferHandle handle, DmaSyncDirection sync_direction,
     size_t offset, size_t count)
 {
-#ifndef __QNX__
     hailo_vdma_buffer_sync_params sync_info{};
     sync_info.handle = handle;
     sync_info.sync_type = (sync_direction == DmaSyncDirection::TO_HOST) ? HAILO_SYNC_FOR_CPU : HAILO_SYNC_FOR_DEVICE;
@@ -481,14 +457,6 @@ hailo_status HailoRTDriver::vdma_buffer_sync(VdmaBufferHandle handle, DmaSyncDir
     sync_info.count = count;
     RUN_AND_CHECK_IOCTL_RESULT(HAILO_VDMA_BUFFER_SYNC, &sync_info, "Failed sync vdma buffer");
     return HAILO_SUCCESS;
-// TODO: HRT-6717 - Remove ifdef when Implement sync ioctl (if determined needed in qnx)
-#else /*  __QNX__ */
-    (void) handle;
-    (void) sync_direction;
-    (void) offset;
-    (void) count;
-    return HAILO_SUCCESS;
-#endif
 }
 
 hailo_status HailoRTDriver::descriptors_list_program(uintptr_t desc_handle, VdmaBufferHandle buffer_handle,
@@ -579,8 +547,6 @@ hailo_status HailoRTDriver::cancel_prepared_transfers(uintptr_t desc_handle)
     return HAILO_SUCCESS;
 }
 
-#if defined(__linux__)
-
 Expected<CmaBufferInfo> HailoRTDriver::vdma_continuous_buffer_alloc(size_t size)
 {
     auto handle_to_dma_address_pair = continous_buffer_alloc_ioctl(size);
@@ -625,23 +591,6 @@ hailo_status HailoRTDriver::vdma_continuous_buffer_free(const CmaBufferInfo &buf
 
     return status;
 }
-#elif defined(__QNX__) || defined(_WIN32)
-
-Expected<CmaBufferInfo> HailoRTDriver::vdma_continuous_buffer_alloc(size_t /* size */)
-{
-    LOGGER__ERROR("Continous buffer not supported for platform");
-    return make_unexpected(HAILO_NOT_SUPPORTED);
-}
-
-hailo_status HailoRTDriver::vdma_continuous_buffer_free(const CmaBufferInfo &/* buffer_info */)
-{
-    LOGGER__ERROR("Continous buffer not supported for platform");
-    return HAILO_NOT_SUPPORTED;
-}
-
-#else
-#error "unsupported platform!"
-#endif
 
 hailo_status HailoRTDriver::mark_as_used()
 {
@@ -766,7 +715,6 @@ DescSizesParams HailoRTDriver::get_sram_desc_params() const
     return desc_sizes_params;
 }
 
-#if defined(__linux__)
 static bool is_blocking_ioctl(unsigned long request)
 {
     switch (request) {
@@ -791,16 +739,6 @@ int HailoRTDriver::run_ioctl(uint32_t ioctl_code, PointerType param)
 
     return run_hailo_ioctl(m_fd, ioctl_code, param);
 }
-#elif defined(__QNX__) || defined(_WIN32)
-
-template<typename PointerType>
-int HailoRTDriver::run_ioctl(uint32_t ioctl_code, PointerType param)
-{
-    return run_hailo_ioctl(m_fd, ioctl_code, param);
-}
-#else
-#error "Unsupported platform"
-#endif
 
 Expected<DescriptorsListInfo> HailoRTDriver::descriptors_list_create(size_t desc_count,
     uint16_t desc_page_size, bool is_circular)
@@ -824,8 +762,6 @@ hailo_status HailoRTDriver::descriptors_list_release(const DescriptorsListInfo &
     RUN_AND_CHECK_IOCTL_RESULT(HAILO_DESC_LIST_RELEASE, &params, "Failed release desc list");
     return HAILO_SUCCESS;
 }
-
-#if defined(__linux__)
 
 Expected<std::pair<uintptr_t, uint64_t>> HailoRTDriver::continous_buffer_alloc_ioctl(size_t size)
 {
@@ -874,8 +810,6 @@ hailo_status HailoRTDriver::continous_buffer_munmap(void *address, size_t size)
     }
     return HAILO_SUCCESS;
 }
-
-#endif
 
 bool HailoRTDriver::is_valid_channel_id(const vdma::ChannelId &channel_id)
 {

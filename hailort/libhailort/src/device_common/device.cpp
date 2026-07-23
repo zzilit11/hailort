@@ -8,9 +8,7 @@
  *
  * TODO: doc
  **/
-#ifdef __unix__
 #include <glob.h>
-#endif
 
 #include "hailo/hailort.h"
 #include "hailo/device.hpp"
@@ -32,9 +30,7 @@
 #include "control_protocol.h"
 #include <memory>
 #include <algorithm>
-#ifndef _MSC_VER
 #include <sys/utsname.h>
-#endif
 
 namespace hailort
 {
@@ -48,7 +44,6 @@ Device::Device(Type type) :
     m_is_control_version_supported(false),
     m_device_architecture(HAILO_ARCH_MAX_ENUM)
 {
-#ifndef _MSC_VER
     struct utsname uname_data;
     if (-1 != uname(&uname_data)) {
         LOGGER__INFO("OS Version: {} {} {} {}", uname_data.sysname, uname_data.release,
@@ -56,7 +51,6 @@ Device::Device(Type type) :
     } else {
         LOGGER__ERROR("uname failed (errno = {})", errno);
     }
-#endif
 }
 
 static bool is_valid_ip_address(const std::string &ip_address)
@@ -341,11 +335,6 @@ Expected<hailo_chip_temperature_info_t> Device::get_chip_temperature()
 
 Expected<hailo_health_stats_t> Device::query_health_stats()
 {
-#ifndef __linux__
-    LOGGER__ERROR("Query health stats is supported only on Linux systems");
-    return make_unexpected(HAILO_NOT_SUPPORTED);
-#else
-
     TRY(auto device_arch, get_architecture());
     CHECK((device_arch == HAILO_ARCH_HAILO15H) || (device_arch == HAILO_ARCH_HAILO15L) || (device_arch == HAILO_ARCH_HAILO15M) ||
         (device_arch == HAILO_ARCH_HAILO10H), HAILO_INVALID_DEVICE_ARCHITECTURE,
@@ -367,17 +356,10 @@ Expected<hailo_health_stats_t> Device::query_health_stats()
     }
 
     return health_stats;
-#endif
 }
 
 Expected<hailo_performance_stats_t> Device::query_performance_stats(std::chrono::milliseconds sampling_period)
 {
-#ifndef __linux__
-    (void)sampling_period;
-    LOGGER__ERROR("Query performance stats is supported only on Linux systems");
-    return make_unexpected(HAILO_NOT_SUPPORTED);
-#else
-
     TRY(auto device_arch, get_architecture());
     CHECK((device_arch == HAILO_ARCH_HAILO15H) || (device_arch == HAILO_ARCH_HAILO15L) || (device_arch == HAILO_ARCH_HAILO15M) ||
         (device_arch == HAILO_ARCH_HAILO10H), HAILO_INVALID_DEVICE_ARCHITECTURE,
@@ -385,7 +367,6 @@ Expected<hailo_performance_stats_t> Device::query_performance_stats(std::chrono:
 
     return PerformanceStatsMeasurement::measure(sampling_period, get_dev_id(),
         HailoRTCommon::get_device_arch_str(device_arch));
-#endif
 }
 
 hailo_status Device::test_chip_memories()

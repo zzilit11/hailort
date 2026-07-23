@@ -10,16 +10,9 @@ set(
     notification_callback
     power_measurement
     multi_process
+    query_performance_and_health_stats
+    async_infer_dma_buffer
 )
-
-if(UNIX)
-    list(
-        APPEND
-        CPP_EXAMPLES
-        query_performance_and_health_stats
-        async_infer_dma_buffer
-    )
-endif()
 
 # add subdirectories for each example, with suffix "_example" and add to the list of targets with prefix "cpp_" and suffix "_example"
 set(CPP_EXAMPLE_TARGETS)

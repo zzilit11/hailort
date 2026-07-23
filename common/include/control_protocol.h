@@ -305,31 +305,15 @@ typedef struct {
     CONTROL_PROTOCOL__status_t status;
 } CONTROL_PROTOCOL__response_header_t;
 
-#if defined(_MSC_VER)
-// TODO: warning C4200
-#pragma warning(push)
-#pragma warning(disable: 4200)
-#endif
 typedef struct {
     uint32_t length;
     uint8_t data[0];
 } CONTROL_PROTOCOL__parameter_t;
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
-#if defined(_MSC_VER)
-// TODO: warning C4200
-#pragma warning(push)
-#pragma warning(disable: 4200)
-#endif
 typedef struct {
     uint32_t parameter_count;
     uint8_t parameters[0];
 } CONTROL_PROTOCOL__payload_t;
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 typedef struct {
     uint32_t protocol_version_length;
@@ -384,22 +368,12 @@ typedef struct {
     uint8_t data[CONTROL_PROTOCOL__MAX_READ_MEMORY_DATA_SIZE];
 } CONTROL_PROTOCOL__read_memory_response_t;
 
-#if defined(_MSC_VER)
-// TODO: warning C4200
-#pragma warning(push)
-#pragma warning(disable: 4200)
-#endif
 typedef struct {
     uint32_t address_length;
     uint32_t address;
     uint32_t data_length;
     uint8_t  data[0];
 } CONTROL_PROTOCOL__write_memory_request_t;
-
-
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 // Tightly coupled with hailo_fw_logger_interface_t
 typedef enum {
@@ -696,11 +670,6 @@ typedef struct {
 } CONTROL_PROTOCOL__i2c_slave_config_t;
 
 
-#if defined(_MSC_VER)
-// TODO: warning C4200
-#pragma warning(push)
-#pragma warning(disable: 4200)
-#endif
 typedef struct {
     CONTROL_PROTOCOL__i2c_slave_config_t slave_config;
     uint32_t register_address_size;
@@ -708,9 +677,6 @@ typedef struct {
     uint32_t data_length;
     uint8_t data[0];
 } CONTROL_PROTOCOL__i2c_write_request_t;
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 typedef struct {
     CONTROL_PROTOCOL__i2c_slave_config_t slave_config;
@@ -725,20 +691,12 @@ typedef struct {
     uint8_t data[CONTROL_PROTOCOL__MAX_I2C_REGISTER_SIZE];
 } CONTROL_PROTOCOL__i2c_read_response_t;
 
-#if defined(_MSC_VER)
-// TODO: warning C4200
-#pragma warning(push)
-#pragma warning(disable: 4200)
-#endif
 typedef struct {
     uint32_t offset_length;
     uint32_t offset;
     uint32_t data_length;
     uint8_t data[0];
 } CONTROL_PROTOCOL__write_firmware_update_request_t;
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 typedef struct {
     uint32_t expected_md5_length;
@@ -778,11 +736,6 @@ typedef struct {
 } CONTROL_PROTOCOL__latency_config_request_t;
 
 
-#if defined(_MSC_VER)
-// TODO: warning C4200
-#pragma warning(push)
-#pragma warning(disable: 4200)
-#endif
 typedef struct {
     uint32_t section_index_length;
     uint32_t section_index;
@@ -807,9 +760,6 @@ typedef struct {
     uint32_t data_length;
     uint8_t data[0];
 } CONTROL_PROTOCOL__sensor_store_config_request_t;
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 typedef struct {
     uint32_t section_index_length;
@@ -961,11 +911,6 @@ typedef struct {
 } CONTROL_PROTOCOL__host_buffer_info_t;
 
 
-#if defined(_MSC_VER)
-// TODO: warning C4200
-#pragma warning(push)
-#pragma warning(disable: 4200)
-#endif
 typedef struct {
     uint32_t is_first_chunk_per_context_length;
     uint8_t is_first_chunk_per_context;
@@ -976,9 +921,6 @@ typedef struct {
     uint32_t context_network_data_length;
     uint8_t context_network_data[0];
 } CONTROL_PROTOCOL__context_switch_set_context_info_request_t;
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 typedef CONTROL_PROTOCOL__read_memory_request_t CONTROL_PROTOCOL__read_user_config_request_t;
 typedef CONTROL_PROTOCOL__read_memory_response_t CONTROL_PROTOCOL__read_user_config_response_t;
@@ -1005,11 +947,6 @@ typedef struct {
     uint16_t action_list_offset;
 } CONTROL_PROTOCOL__download_context_action_list_request_t;
 
-#if defined(_MSC_VER)
-// TODO: warning C4200
-#pragma warning(push)
-#pragma warning(disable: 4200)
-#endif
 typedef struct {
     uint32_t base_address_length;
     uint32_t base_address;
@@ -1022,9 +959,6 @@ typedef struct {
     uint32_t action_list_length;
     uint8_t action_list[0];
 } CONTROL_PROTOCOL__download_context_action_list_response_t;
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 typedef enum {
     CONTROL_PROTOCOL__CONTEXT_SWITCH_STATUS_RESET = 0,

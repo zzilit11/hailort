@@ -17,21 +17,12 @@
 #include <map>
 #include <assert.h>
 
-#ifndef _MSC_VER
+#include <pthread.h>
 #include <sys/mman.h>
-#endif
-
-#ifndef _MSC_VER
-// Windows did the right choice - not supporting fork() at all, so we don't support it either.
-#define HAILO_IS_FORK_SUPPORTED
-#endif
-
 
 namespace hailort
 {
 
-
-#ifdef HAILO_IS_FORK_SUPPORTED
 
 // Replacement for std::recursive_mutex
 class RecursiveSharedMutex final {
@@ -204,15 +195,6 @@ private:
     std::mutex m_mutex;
     std::map<Key, AtForkCallbacks> m_callbacks;
 };
-
-#else /* HAILO_IS_FORK_SUPPORTED */
-using RecursiveSharedMutex = std::recursive_mutex;
-using SharedConditionVariable = std::condition_variable_any;
-
-
-class SharedAllocatedObject {};
-#endif
-
 
 } /* namespace hailort */
 

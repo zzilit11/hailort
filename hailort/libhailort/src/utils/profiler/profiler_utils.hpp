@@ -12,10 +12,8 @@
 
 #include "utils/hailort_logger.hpp"
 
-#if defined(__linux__)
 #include <sys/sysinfo.h>
 #include <sys/utsname.h>
-#endif
 
 namespace hailort
 {
@@ -42,7 +40,6 @@ struct pci_info {
     pci_info() : gen("N/A"), lanes("N/A") {}
 };
 
-#if defined(__linux__)
 std::string os_name()
 {
     struct utsname uts;
@@ -157,7 +154,6 @@ pci_info get_pcie_info() {
     std::string lspci_output = exec("lspci -vvv");
     return parse_lspci_output(lspci_output);
 }
-#endif
 
 ProfilerTime get_curr_time()
 {

@@ -189,16 +189,10 @@
 #ifndef STBIR_INCLUDE_STB_IMAGE_RESIZE_H
 #define STBIR_INCLUDE_STB_IMAGE_RESIZE_H
 
-#ifdef _MSC_VER
-typedef unsigned char  stbir_uint8;
-typedef unsigned short stbir_uint16;
-typedef unsigned int   stbir_uint32;
-#else
 #include <stdint.h>
 typedef uint8_t  stbir_uint8;
 typedef uint16_t stbir_uint16;
 typedef uint32_t stbir_uint32;
-#endif
 
 #ifndef STBIRDEF
 #ifdef STB_IMAGE_RESIZE_STATIC
@@ -408,25 +402,17 @@ STBIRDEF int stbir_resize_region(  const void *input_pixels , int input_w , int 
 #define STBIR_FREE(ptr,c)    ((void)(c), free(ptr))
 #endif
 
-#ifndef _MSC_VER
 #ifdef __cplusplus
 #define stbir__inline inline
 #else
 #define stbir__inline
-#endif
-#else
-#define stbir__inline __forceinline
 #endif
 
 
 // should produce compiler error if size is wrong
 typedef unsigned char stbir__validate_uint32[sizeof(stbir_uint32) == 4 ? 1 : -1];
 
-#ifdef _MSC_VER
-#define STBIR__NOTUSED(v)  (void)(v)
-#else
 #define STBIR__NOTUSED(v)  (void)sizeof(v)
-#endif
 
 #define STBIR__ARRAY_SIZE(a) (sizeof((a))/sizeof((a)[0]))
 
@@ -462,11 +448,7 @@ typedef unsigned char stbir__validate_uint32[sizeof(stbir_uint32) == 4 ? 1 : -1]
 
 
 
-#ifdef _MSC_VER
-#define STBIR__UNUSED_PARAM(v)  (void)(v)
-#else
 #define STBIR__UNUSED_PARAM(v)  (void)sizeof(v)
-#endif
 
 // must match stbir_datatype
 static unsigned char stbir__type_size[] = {

@@ -15,11 +15,7 @@
 #include "hailo/expected.hpp"
 #include "common/logger_macros.hpp"
 
-#if defined(_MSC_VER)
-#include <windows.h>
-#else
 #include "common/filesystem.hpp"
-#endif
 
 #include <memory>
 
@@ -31,11 +27,7 @@ class NamedMutex final
 public:
     static Expected<std::shared_ptr<NamedMutex>> create(const std::string &path);
 
-#if defined(_MSC_VER)
-    NamedMutex(const std::string &path, HANDLE mutex_handle) : m_path(path), m_mutex_handle(mutex_handle) {}
-#else
     NamedMutex(const std::string &path, LockedFile &&locked_file) : m_path(path), m_locked_file(std::move(locked_file)) {}
-#endif
     ~NamedMutex();
 
     const std::string &path() const { return m_path; }
@@ -45,11 +37,7 @@ public:
 private:
     const std::string m_path;
 
-#if defined(_MSC_VER)
-    HANDLE m_mutex_handle;
-#else
     LockedFile m_locked_file;
-#endif
 
 public:
     class LockGuard final

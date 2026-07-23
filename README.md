@@ -17,7 +17,7 @@ and transfer data to/from the device; it includes the Hailo-8 firmware that runs
 - pyHailoRT - HailoRT Python API, which wraps the runtime library.
 - HailoRT GStreamer element (HailoNet).
 
-HailoRT supports Linux and Windows, and it can be compiled from sources to be integrated with various x86 and ARM processors.
+HailoRT supports Linux exclusively and can be compiled from source for supported x86 and ARM processors.
 
 ## Usage
 

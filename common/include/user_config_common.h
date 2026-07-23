@@ -21,10 +21,6 @@
 #define USER_CONFIG_TEMPERATURE_DEFAULT_ORANGE_HYSTERESIS_ALARM_THRESHOLD (99.f)
 
 #pragma pack(push, 1)
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable: 4200)
-#endif
 typedef struct {
     uint32_t magic;
     uint32_t version;
@@ -38,9 +34,6 @@ typedef struct {
     uint32_t entry_size;
     uint8_t value[0];
 } USER_CONFIG_ENTRY_t;
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 #pragma pack(pop)
 
 // Used by user config defaults

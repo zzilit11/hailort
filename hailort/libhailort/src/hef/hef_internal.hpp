@@ -10,21 +10,11 @@
 #ifndef _HEF_INTERNAL_HPP_
 #define _HEF_INTERNAL_HPP_
 
-// https://github.com/protocolbuffers/protobuf/tree/master/cmake#notes-on-compiler-warnings
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable: 4244 4267 4127)
-#else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
 #include "hef.pb.h"
-#if defined(_MSC_VER)
-#pragma warning( pop ) 
-#else
 #pragma GCC diagnostic pop
-#endif
 
 #include "hailo/hailort.h"
 #include "hailo/expected.hpp"

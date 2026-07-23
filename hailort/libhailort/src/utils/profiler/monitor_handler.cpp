@@ -198,8 +198,6 @@ scheduler_core_op_handle_t MonitorHandler::get_core_op_handle_by_name(const std:
 
 hailo_status MonitorHandler::start_mon(const std::string &unique_vdevice_hash)
 {
-#if defined(__GNUC__)
-
     /* Clearing monitor members. Since the owner of monitor_handler is tracer, which is static,
     the monitor may get rerun without destructor being called. */
     if (m_is_monitor_currently_working) {
@@ -245,13 +243,7 @@ hailo_status MonitorHandler::start_mon(const std::string &unique_vdevice_hash)
     });
 
     return HAILO_SUCCESS;
-#else
-    (void)unique_vdevice_hash;
-    return HAILO_NOT_IMPLEMENTED;
-#endif
 }
-
-#if defined(__GNUC__)
 
 Expected<std::shared_ptr<TempFile>> MonitorHandler::open_temp_mon_file(const std::string &file_name, const std::string &file_dir)
 {
@@ -351,7 +343,6 @@ void MonitorHandler::dump_state()
         LOGGER__ERROR("Failed to rename tmp file to monitor file: errno = {}", errno);
     }
 }
-#endif
 
 void MonitorHandler::time_dependent_events_cycle_calc()
 {
@@ -371,9 +362,7 @@ void MonitorHandler::log_monitor_device_infos(ProtoMon &mon)
     for (auto const &device_info_pair : m_devices_info) {
         auto curr_device_utilization = device_info_pair.second.device_utilization_duration;
         auto utilization_percentage = ((curr_device_utilization * 100) /  m_last_measured_time_duration);
-#if defined(__GNUC__)
         write_utilization_to_file(utilization_percentage);
-#endif
 
         auto device_infos = mon.add_device_infos();
         device_infos->set_device_id(device_info_pair.second.device_id);

@@ -23,10 +23,6 @@
 * -------------------------------------------------------------------
 */
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable: 4127)
-#else // Not MSC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion" 
 #pragma GCC diagnostic ignored "-Wfloat-conversion" 
@@ -34,7 +30,6 @@
 #if defined(__GNUC__) && (__GNUC__ >= 11)
     #pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif // GCC version
-#endif // Not MSC
 
 #ifndef LIBROSA_H_
 #define LIBROSA_H_
@@ -283,8 +278,4 @@ public:
 
 #endif
 
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#else
 #pragma GCC diagnostic pop
-#endif

@@ -16,29 +16,17 @@
 #include "hailo/expected.hpp"
 
 /** Socket-related includes */
-#if defined(_MSC_VER)
-// Windows socket headers
-#include <winsock2.h>  // SOCKET, closesocket, send, recv
-#include <Ws2tcpip.h>  // socklen_t, inet_pton, inet_ntop
-#include <afunix.h>    // sockaddr_un
-#else
-// UNIX socket headers
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/un.h>
-#endif
 
 /** Typedefs */
 
 // socket_t
 #ifndef socket_t
-#if defined(_MSC_VER)
-typedef SOCKET socket_t;
-#else
 typedef int socket_t;
-#endif
 #endif
 
 // timeval_t
@@ -53,13 +41,11 @@ typedef struct timeval timeval_t;
 #define MSG_NOSIGNAL 0
 #endif
 
-#if !defined(_MSC_VER) && !defined(INVALID_SOCKET)
-// Already defined in Windows
+#if !defined(INVALID_SOCKET)
 #define INVALID_SOCKET (socket_t)(-1)
 #endif
 
-#if !defined(_MSC_VER) && !defined(SOCKET_ERROR)
-// Already defined in Windows
+#if !defined(SOCKET_ERROR)
 #define SOCKET_ERROR (int)(-1)
 #endif
 

@@ -13,11 +13,7 @@
 #include <exception>
 using namespace std;
 
-#if defined(_WIN32)
-#include <winsock2.h>
-#else
 #include <netinet/in.h>
-#endif
 
 #include "hailo/hailort.h"
 #include "hailo/hailort_defaults.hpp"

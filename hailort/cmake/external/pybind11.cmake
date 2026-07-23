@@ -19,7 +19,7 @@ if(NOT pybind11_POPULATED)
         if(NOT PYTHON_EXECUTABLE AND PYBIND11_PYTHON_VERSION)
             # venv version is prioritized (instead of PYBIND11_PYTHON_VERSION) if PYTHON_EXECUTABLE is not set.
             # See https://pybind11.readthedocs.io/en/stable/changelog.html#v2-6-0-oct-21-2020
-            if((${CMAKE_VERSION} VERSION_LESS "3.22.0") AND (NOT WIN32))
+            if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
                 find_package(PythonInterp ${PYBIND11_PYTHON_VERSION} REQUIRED)
                 set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
             else()

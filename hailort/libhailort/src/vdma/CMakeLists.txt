@@ -1,16 +1,6 @@
 cmake_minimum_required(VERSION 3.5.0)
 
-if(WIN32)
-    set(DRIVER_OS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/driver/os/windows")
-elseif(UNIX)
-    if (CMAKE_SYSTEM_NAME STREQUAL QNX)
-        set(DRIVER_OS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/driver/os/posix/qnx")
-    else()
-        set(DRIVER_OS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/driver/os/posix/linux")
-    endif()
-else()
-    message(FATAL_ERROR "Unexpeced platform target, stopping build")
-endif()
+set(DRIVER_OS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/driver/os/posix/linux")
 set(DRIVER_OS_DIR ${DRIVER_OS_DIR} PARENT_SCOPE)
 
 set(DRIVER_SRC_FILES

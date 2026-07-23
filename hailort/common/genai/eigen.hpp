@@ -7,24 +7,15 @@
  * @brief Includes the Eigen library with the required compiler instructions
  **/
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable: 4127)
-#else // Not MSC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #if defined(__GNUC__) && (__GNUC__ >= 11)
     #pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif // GCC version
-#endif // Not MSC
 #include <Eigen/Dense>
 #include <Eigen/Core>
 #include <unsupported/Eigen/FFT>
 #include <unsupported/Eigen/CXX11/Tensor>
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#else
 #pragma GCC diagnostic pop
-#endif
 

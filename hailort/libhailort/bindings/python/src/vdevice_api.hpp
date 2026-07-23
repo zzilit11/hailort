@@ -87,15 +87,12 @@ public:
         return std::make_shared<VDeviceWrapper>(params);
     }
 
-    VDeviceWrapper(const hailo_vdevice_params_t &params)
-#ifdef HAILO_IS_FORK_SUPPORTED
-        :
+    VDeviceWrapper(const hailo_vdevice_params_t &params) :
         m_atfork_guard(this, {
             .before_fork = [this]() { if (m_vdevice) m_vdevice->before_fork(); },
             .after_fork_in_parent = [this]() { if (m_vdevice) m_vdevice->after_fork_in_parent(); },
             .after_fork_in_child = [this]() { if (m_vdevice) m_vdevice->after_fork_in_child(); },
         })
-#endif
     {
         auto vdevice_expected = VDevice::create_shared(params);
         VALIDATE_EXPECTED(vdevice_expected);
@@ -162,9 +159,7 @@ private:
     std::vector<std::shared_ptr<ConfiguredNetworkGroup>> m_net_groups;
     bool m_is_using_service;
 
-#ifdef HAILO_IS_FORK_SUPPORTED
     AtForkRegistry::AtForkGuard m_atfork_guard;
-#endif
 
     friend class LLMWrapper;
     friend class VLMWrapper;

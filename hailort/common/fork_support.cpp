@@ -13,7 +13,6 @@
 namespace hailort
 {
 
-#ifdef HAILO_IS_FORK_SUPPORTED
 RecursiveSharedMutex::RecursiveSharedMutex()
 {
     // Make sharable mutex
@@ -186,8 +185,5 @@ void SharedConditionVariable::notify_all()
 {
     pthread_cond_broadcast(&m_cond);
 }
-
-#endif /* HAILO_IS_FORK_SUPPORTED */
-
 
 } /* namespace hailort */

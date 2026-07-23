@@ -30,19 +30,12 @@ if(NOT protobuf_POPULATED)
 
                 -Dprotobuf_BUILD_TESTS:BOOL=OFF
                 -Dprotobuf_WITH_ZLIB:BOOL=OFF
-                -Dprotobuf_MSVC_STATIC_RUNTIME:BOOL=OFF
             BUILD_ARGS
-                # NOTE: We are installing instead of building protoc because "hailort\external\protobuf-build\cmake\protobuf-targets.cmake" (in Windows) is based on config type.
-                # TODO: consider importing protobuf_generate_cpp instead? will it solve it?
                 --config ${TOOL_BUILD_TYPE} --target install ${CMAKE_EXTRA_BUILD_ARGS}
             PARALLEL_BUILD
         )
 
-        if(WIN32)
-            set(PROTOBUF_CONFIG_DIR ${PROTOBUF_INSTALL_DIR}/cmake)
-        else()
-            set(PROTOBUF_CONFIG_DIR ${PROTOBUF_INSTALL_DIR}/lib/cmake/protobuf)
-        endif()
+        set(PROTOBUF_CONFIG_DIR ${PROTOBUF_INSTALL_DIR}/lib/cmake/protobuf)
 
         # Include host protobuf for protoc (https://stackoverflow.com/questions/53651181/cmake-find-protobuf-package-in-custom-directory)
         include(${PROTOBUF_CONFIG_DIR}/protobuf-config.cmake)
@@ -50,14 +43,11 @@ if(NOT protobuf_POPULATED)
 
         set(protobuf_BUILD_TESTS OFF CACHE BOOL "Build protobuf tests" FORCE)
         set(protobuf_BUILD_PROTOC_BINARIES OFF CACHE BOOL "Build libprotoc and protoc compiler" FORCE)
-        set(protobuf_MSVC_STATIC_RUNTIME OFF CACHE BOOL "Protobuf MSVC static runtime" FORCE)
         set(protobuf_WITH_ZLIB OFF CACHE BOOL "Compile protobuf with zlib" FORCE)
         add_subdirectory(${protobuf_SOURCE_DIR} ${protobuf_BINARY_DIR} EXCLUDE_FROM_ALL)
 
-        if(NOT MSVC)
-            set_target_properties(libprotobuf PROPERTIES POSITION_INDEPENDENT_CODE ON)
-            set_target_properties(libprotobuf-lite PROPERTIES POSITION_INDEPENDENT_CODE ON)
-        endif()
+        set_target_properties(libprotobuf PROPERTIES POSITION_INDEPENDENT_CODE ON)
+        set_target_properties(libprotobuf-lite PROPERTIES POSITION_INDEPENDENT_CODE ON)
     endif()
 endif()
 

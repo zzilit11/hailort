@@ -23,11 +23,7 @@
 namespace hailort
 {
 
-#ifdef _WIN32
-#define PATH_SEPARATOR "\\"
-#else
 #define PATH_SEPARATOR "/"
-#endif
 
 #define HAILORT_SYSLOG_LOGGER_PATTERN ("[%s:%#] [%!] %v") // File logger will print: [source file:line number] [function name] msg (log level and timestamp are built-in the syslog file)
 

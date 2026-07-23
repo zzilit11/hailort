@@ -18,54 +18,8 @@ option(HAILO_BUILD_USB "Build USB" OFF)
 option(HAILO_BUILD_FUNCTIONFS_LISTENER "Build FunctionFS listener" OFF)
 option(HAILO_BUILD_OLLAMA "Build Hailo-Ollama GenAI Model Server" OFF)
 
-# Ensure Windows SDK knows the target architecture to avoid "No Target Architecture" errors.
-if (WIN32)
-    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-        add_compile_definitions(_AMD64_=1)
-    else()
-        add_compile_definitions(_X86_=1)
-    endif()
-endif()
-
-# On Windows with MSVC, CMake's FindOpenSSL searches lib/VC but the Shining Light
-# OpenSSL installer places libraries under lib/VC/<arch>/<runtime> (e.g. lib/VC/x64/MD).
-# Pre-seed FindOpenSSL's internal find_library cache variables so they resolve correctly.
-if(WIN32 AND MSVC AND HAILO_BUILD_OLLAMA)
-    # Default OPENSSL_ROOT_DIR to the standard Shining Light install location
-    if(NOT OPENSSL_ROOT_DIR)
-        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-            set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
-        else()
-            set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL")
-        endif()
-    endif()
-
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(_openssl_arch "x64")
-    else()
-        set(_openssl_arch "x86")
-    endif()
-    set(_openssl_vc_lib_dir "${OPENSSL_ROOT_DIR}/lib/VC/${_openssl_arch}/MD")
-
-    if(NOT LIB_EAY_RELEASE AND EXISTS "${_openssl_vc_lib_dir}/libcrypto.lib")
-        set(LIB_EAY_RELEASE "${_openssl_vc_lib_dir}/libcrypto.lib" CACHE FILEPATH "")
-    endif()
-    if(NOT SSL_EAY_RELEASE AND EXISTS "${_openssl_vc_lib_dir}/libssl.lib")
-        set(SSL_EAY_RELEASE "${_openssl_vc_lib_dir}/libssl.lib" CACHE FILEPATH "")
-    endif()
-
-    unset(_openssl_vc_lib_dir)
-    unset(_openssl_arch)
-endif()
-
 if (HAILO_COMPILE_WARNING_AS_ERROR)
-    if(WIN32)
-        set(HAILORT_COMPILE_OPTIONS ${HAILORT_COMPILE_OPTIONS} /WX)
-    elseif(UNIX)
-        set(HAILORT_COMPILE_OPTIONS ${HAILORT_COMPILE_OPTIONS} -Werror)
-    else()
-        message(FATAL_ERROR "Unexpeced host, stopping build")
-    endif()
+    set(HAILORT_COMPILE_OPTIONS ${HAILORT_COMPILE_OPTIONS} -Werror)
 endif()
 
 # Flag for emulator (FPGA/Veloce)
@@ -119,15 +73,6 @@ if(HAILO_BUILD_TOOLS)
     add_subdirectory(tools)
 endif()
 
-if(HAILO_WIN_DRIVER)
-    add_subdirectory(drivers/win)
-endif()
-
 if(HAILO_SUPPORT_PACKAGING)
     add_subdirectory(packaging)
-endif()
-
-# Compile PCIe Driver if QNX
-if(CMAKE_SYSTEM_NAME STREQUAL QNX)
-    add_subdirectory(drivers/qnx)
 endif()

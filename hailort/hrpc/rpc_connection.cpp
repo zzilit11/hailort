@@ -115,8 +115,6 @@ hailo_status RpcConnection::read_buffers(std::vector<TransferBuffer> &&buffers, 
     return transfer_status;
 }
 
-#ifdef __linux__
-
 Expected<std::shared_ptr<FileDescriptor>> RpcConnection::read_dmabuf_fd()
 {
     TRY(auto fd, m_session->read_fd());
@@ -126,15 +124,6 @@ Expected<std::shared_ptr<FileDescriptor>> RpcConnection::read_dmabuf_fd()
 
     return fd_ptr;
 }
-
-#else
-
-Expected<std::shared_ptr<FileDescriptor>> RpcConnection::read_dmabuf_fd()
-{
-    return make_unexpected(HAILO_NOT_SUPPORTED);
-}
-
-#endif
 
 hailo_status RpcConnection::wait_for_write_message_async_ready(size_t buffer_size, std::chrono::milliseconds timeout)
 {

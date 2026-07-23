@@ -27,11 +27,6 @@
 #include <list>
 #include <cerrno>
 
-#ifdef __QNX__
-#include <sys/mman.h>
-#endif // __QNX__
-
-
 namespace hailort
 {
 
@@ -40,11 +35,7 @@ static_assert((0 == ((ONGOING_TRANSFERS_SIZE - 1) & ONGOING_TRANSFERS_SIZE)), "O
 
 #define MIN_ACTIVE_TRANSFERS_SCALE (2)
 
-#if defined(_WIN32)
-#define MAX_ACTIVE_TRANSFERS_SCALE (8)
-#else
 #define MAX_ACTIVE_TRANSFERS_SCALE (32)
-#endif
 
 #define HAILO_MAX_BATCH_SIZE ((ONGOING_TRANSFERS_SIZE / MIN_ACTIVE_TRANSFERS_SCALE) - 1)
 
@@ -391,18 +382,13 @@ private:
     size_t m_dma_engines_count;
     DeviceBoardType m_board_type;
     bool m_is_fw_loaded;
-#ifdef __QNX__
-    pid_t m_resource_manager_pid;
-#endif // __QNX__
 
-#ifdef __linux__
     // TODO: HRT-11595 fix linux driver deadlock and remove the mutex.
     // Currently, on the linux, the mmap syscall is called under current->mm lock held. Inside, we lock the board
     // mutex. On other ioctls, we first lock the board mutex, and then lock current->mm mutex (For example - before
     // pinning user address to memory and on copy_to_user/copy_from_user calls).
     // Need to refactor the driver lock mechanism and then remove the mutex from here.
     std::mutex m_driver_lock;
-#endif
 };
 
 inline hailo_dma_buffer_direction_t to_hailo_dma_direction(HailoRTDriver::DmaDirection dma_direction)

@@ -116,15 +116,12 @@ void InputVStreamsWrapper::bind(py::module &m)
 }
 
 InputVStreamsWrapper::InputVStreamsWrapper(std::unordered_map<std::string, std::shared_ptr<InputVStream>> &input_vstreams) :
-    m_input_vstreams(std::move(input_vstreams))
-#ifdef HAILO_IS_FORK_SUPPORTED
-        ,
-        m_atfork_guard(this, {
-            .before_fork = [this]() { before_fork(); },
-            .after_fork_in_parent = [this]() { after_fork_in_parent(); },
-            .after_fork_in_child = [this]() { after_fork_in_child(); }
-        })
-#endif
+    m_input_vstreams(std::move(input_vstreams)),
+    m_atfork_guard(this, {
+        .before_fork = [this]() { before_fork(); },
+        .after_fork_in_parent = [this]() { after_fork_in_parent(); },
+        .after_fork_in_child = [this]() { after_fork_in_child(); }
+    })
 {}
 
 py::dtype OutputVStreamWrapper::get_dtype(OutputVStream &self)
@@ -288,15 +285,12 @@ void OutputVStreamsWrapper::bind(py::module &m)
 }
 
 OutputVStreamsWrapper::OutputVStreamsWrapper(std::unordered_map<std::string, std::shared_ptr<OutputVStream>> &output_vstreams) :
-    m_output_vstreams(std::move(output_vstreams))
-#ifdef HAILO_IS_FORK_SUPPORTED
-        ,
-        m_atfork_guard(this, {
-            .before_fork = [this]() { before_fork(); },
-            .after_fork_in_parent = [this]() { after_fork_in_parent(); },
-            .after_fork_in_child = [this]() { after_fork_in_child(); }
-        })
-#endif
+    m_output_vstreams(std::move(output_vstreams)),
+    m_atfork_guard(this, {
+        .before_fork = [this]() { before_fork(); },
+        .after_fork_in_parent = [this]() { after_fork_in_parent(); },
+        .after_fork_in_child = [this]() { after_fork_in_child(); }
+    })
 {}
 
 InferVStreamsWrapper InferVStreamsWrapper::create(ConfiguredNetworkGroupWrapper &network_group,

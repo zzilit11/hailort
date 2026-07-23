@@ -17,13 +17,7 @@ extern "C" {
 #include <stdint.h>
 
 #if !defined(__BYTE_ORDER__)
-// TODO: Check this better?
-#if defined(_MSC_VER)
-#define __ORDER_LITTLE_ENDIAN__ (1)
-#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
-#else
 #error "Unexpected byte order"
-#endif
 #endif
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__

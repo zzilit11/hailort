@@ -108,9 +108,9 @@ private:
     // release_resource (what they expect us to do?).
     // It is important to leak the memory since we may not be able to free the objects when the process is being
     // destructed:
-    //    1. On windows for example, the static variables are destroyed *after* the threads stops.
-    //       Some shared resources waits for their threads to do something, and they can stack for ever.
-    //    2. The object destruction may relay on other singleton object destruction.
+    //    1. Static variables may be destroyed after worker threads stop. Some shared resources wait for
+    //       their threads to do something and can remain blocked forever.
+    //    2. Object destruction may rely on another singleton's destruction order.
     ~SharedResourceManager()
     {
         for (auto &resource : m_resources) {

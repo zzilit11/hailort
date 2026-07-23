@@ -54,14 +54,13 @@ public:
     static DeviceWrapperPtr create_pcie(hailo_pcie_device_info_t &device_info);
     void release();
 
-    DeviceWrapper(std::unique_ptr<Device> &&device) : m_device(std::move(device))
-#ifdef HAILO_IS_FORK_SUPPORTED
-    , m_atfork_guard(this, {
-        .before_fork = [this]() { if (m_device) m_device->before_fork(); },
-        .after_fork_in_parent = [this]() { if (m_device) m_device->after_fork_in_parent(); },
-        .after_fork_in_child = [this]() { if (m_device) m_device->after_fork_in_child(); },
-    })
-#endif
+    DeviceWrapper(std::unique_ptr<Device> &&device) :
+        m_device(std::move(device)),
+        m_atfork_guard(this, {
+            .before_fork = [this]() { if (m_device) m_device->before_fork(); },
+            .after_fork_in_parent = [this]() { if (m_device) m_device->after_fork_in_parent(); },
+            .after_fork_in_child = [this]() { if (m_device) m_device->after_fork_in_child(); },
+        })
     {}
 
     Device& device()
@@ -130,9 +129,7 @@ public:
 
 private:
     std::unique_ptr<Device> m_device;
-#ifdef HAILO_IS_FORK_SUPPORTED
     AtForkRegistry::AtForkGuard m_atfork_guard;
-#endif
 };
 
 } /* namespace hailort */

@@ -16,9 +16,7 @@
 #include <vector>
 #include <array>
 #include <chrono>
-#if defined(__GNUC__)
 #include <poll.h>
-#endif
 
 namespace hailort
 {
@@ -40,11 +38,7 @@ public:
 
 private:
 
-#if defined(__linux__)
     using WaitableHandle = pollfd;
-#else
-    using WaitableHandle = underlying_waitable_handle_t;
-#endif
 
     static std::vector<WaitableHandle> create_waitable_handle_vector(
         const std::vector<std::reference_wrapper<Waitable>> &waitables)
@@ -52,11 +46,7 @@ private:
         std::vector<WaitableHandle> waitable_handles;
         waitable_handles.reserve(waitables.size());
         for (auto &waitable : waitables) {
-#if defined(__linux__)
             waitable_handles.emplace_back(pollfd{waitable.get().get_underlying_handle(), POLLIN, 0});
-#else
-            waitable_handles.emplace_back(waitable.get().get_underlying_handle());
-#endif
         }
         return waitable_handles;
     }

@@ -33,11 +33,7 @@
 
 void sleep_seconds(uint32_t duration_seconds)
 {
-#if defined(__unix__) || defined(__QNX__)
     sleep(duration_seconds);
-#else
-    Sleep(duration_seconds);
-#endif
 }
 
 void parse_arguments(int argc, char **argv, hailo_power_measurement_types_t *measurement_type)

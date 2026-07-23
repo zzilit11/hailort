@@ -25,20 +25,11 @@
 #include <string>
 #include <thread>
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable: 4244 4267 4127)
-#else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wconversion"
-#endif
 #include "scheduler_mon.pb.h"
-#if defined(_MSC_VER)
-#pragma warning( pop )
-#else
 #pragma GCC diagnostic pop
-#endif
 
 namespace hailort
 {
@@ -180,11 +171,9 @@ public:
 
 private:
     hailo_status start_mon(const std::string &unique_vdevice_hash);
-#if defined(__GNUC__)
     Expected<std::shared_ptr<TempFile>> open_temp_mon_file(const std::string &file_name, const std::string &file_dir);
     void write_utilization_to_file(const double utilization_percentage);
     void dump_state();
-#endif
     void time_dependent_events_cycle_calc();
     void log_monitor_device_infos(ProtoMon &mon);
     void log_monitor_networks_infos(ProtoMon &mon);
@@ -200,10 +189,8 @@ private:
     bool m_is_monitor_currently_working = false;
     std::thread m_mon_thread;
     EventPtr m_mon_shutdown_event;
-#if defined(__GNUC__)
     std::shared_ptr<TempFile> m_mon_tmp_output;
     std::shared_ptr<TempFile> m_nnc_utilization_tmp_output;
-#endif
     std::chrono::time_point<std::chrono::steady_clock> m_last_measured_timestamp;
     double m_last_measured_time_duration;
     // TODO: Consider adding Accumulator classes for more info (min, max, mean, etc..)

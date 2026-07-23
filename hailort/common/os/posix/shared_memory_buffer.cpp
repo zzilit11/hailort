@@ -21,8 +21,6 @@
 namespace hailort
 {
 
-#ifndef __ANDROID__
-
 Expected<SharedMemoryBufferPtr> SharedMemoryBuffer::create(size_t size, const std::string &shm_name)
 {
     auto shm_segment_fd = shm_open(shm_name.c_str(), (O_CREAT | O_RDWR), (S_IRWXU | S_IRWXG | S_IRWXO)); // mode 0777
@@ -73,40 +71,5 @@ std::string SharedMemoryBuffer::shm_name()
 {
     return m_shm_name;
 }
-
-#else
-
-// TODO: HRT-14770 support android shared memory
-Expected<SharedMemoryBufferPtr> SharedMemoryBuffer::create(size_t, const std::string &)
-{
-    LOGGER__ERROR("SharedMemoryBuffer::create is not implemented for Android");
-    return make_unexpected(HAILO_NOT_IMPLEMENTED);
-}
-
-Expected<SharedMemoryBufferPtr> SharedMemoryBuffer::open(size_t, const std::string &)
-{
-    LOGGER__ERROR("SharedMemoryBuffer::open is not implemented for Android");
-    return make_unexpected(HAILO_NOT_IMPLEMENTED);
-}
-
-size_t SharedMemoryBuffer::size() const
-{
-    LOGGER__ERROR("SharedMemoryBuffer::size is not implemented for Android");
-    return 0;
-}
-
-void *SharedMemoryBuffer::user_address()
-{
-    LOGGER__ERROR("SharedMemoryBuffer::user_address is not implemented for Android");
-    return nullptr;
-}
-
-std::string SharedMemoryBuffer::shm_name()
-{
-    LOGGER__ERROR("SharedMemoryBuffer::shm_name is not implemented for Android");
-    return "";
-}
-
-#endif
 
 } /* namespace hailort */

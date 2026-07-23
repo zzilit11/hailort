@@ -48,15 +48,12 @@ public:
     }
 
     ConfiguredNetworkGroupWrapper(std::shared_ptr<ConfiguredNetworkGroup> cng, bool store_guard_for_multi_process = false) :
-        m_cng(cng)
-#ifdef HAILO_IS_FORK_SUPPORTED
-        ,
+        m_cng(cng),
         m_atfork_guard(this, {
             .before_fork = [this]() { before_fork(); },
             .after_fork_in_parent = [this]() { after_fork_in_parent(); },
             .after_fork_in_child = [this]() { after_fork_in_child(); }
         })
-#endif
     {
         if (store_guard_for_multi_process) {
             m_cng_guard_for_mt = cng;
@@ -304,15 +301,12 @@ private:
     // to force free the network group before freeing the device/vdevice.
     std::weak_ptr<ConfiguredNetworkGroup> m_cng;
 
-    // On multi-process, when pickling this object (the windows multi-process flow) the device/vdevice
-    // doesn't own the network group object.
+    // When unpickling this object in a multi-process flow, the device/vdevice doesn't own the network group object.
     // To solve this problem, we store here and optional guard for the network group that will exist
     // only when the object is constructed with pickle.
     std::shared_ptr<ConfiguredNetworkGroup> m_cng_guard_for_mt;
 
-#ifdef HAILO_IS_FORK_SUPPORTED
     AtForkRegistry::AtForkGuard m_atfork_guard;
-#endif
 };
 
 void NetworkGroup_api_initialize_python_module(py::module &m);

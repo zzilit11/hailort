@@ -13,9 +13,7 @@
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#ifdef __unix__
 #include <spdlog/sinks/syslog_sink.h>
-#endif
 
 #ifdef HAILO_GENAI_SERVER
 #include "llm/llm_server.hpp"
@@ -41,7 +39,6 @@ static void init_logger(const std::string &name)
     console_sink->set_pattern(LOGGER_PATTERN);
 
     std::vector<std::shared_ptr<spdlog::sinks::sink>> sink_vector = { console_sink };
-#ifdef __unix__
     auto syslog_sink = hailort::make_shared_nothrow<spdlog::sinks::syslog_sink_mt>(name, 0, LOG_USER, true);
     if (nullptr == syslog_sink) {
         std::cerr << "Failed to create syslog sink for hailort server log!" << std::endl;
@@ -58,7 +55,6 @@ static void init_logger(const std::string &name)
     }
     syslog_sink->set_pattern(HAILORT_SYSLOG_LOGGER_PATTERN);
     sink_vector.push_back(syslog_sink);
-#endif
     auto logger = hailort::make_shared_nothrow<spdlog::logger>(name, sink_vector.begin(), sink_vector.end());
     if (nullptr == logger) {
         std::cerr << "Failed to create logger for hailort server!" << std::endl;

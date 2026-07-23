@@ -3,8 +3,6 @@ from typing import List
 import signal
 import struct
 
-import sys
-
 from collections import deque
 from dataclasses import dataclass
 from argparse import ArgumentTypeError
@@ -1751,8 +1749,7 @@ class Control:
         self.__device = device
 
         # TODO: should remove?
-        if sys.platform != "win32":
-            signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGWINCH])
+        signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGWINCH])
 
         self._identify_info = self.identify()
 

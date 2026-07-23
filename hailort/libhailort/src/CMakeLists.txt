@@ -86,19 +86,14 @@ get_property(PERFETTO_DEFS GLOBAL PROPERTY PERFETTO_COMPILE_DEFS)
 target_compile_definitions(libhailort PRIVATE ${PERFETTO_DEFS})
 
 # Include libraries
-if(WIN32)
-    set_property(TARGET libhailort PROPERTY
-        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-else()
-    target_link_libraries(libhailort PRIVATE
-        m # libmath
-        atomic
-    )
+target_link_libraries(libhailort PRIVATE
+    m # libmath
+    atomic
+)
 
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-    # Hack to support cross-compilation - https://stackoverflow.com/a/49086560
-    set(THREADS_PTHREAD_ARG "0" CACHE STRING "Result from TRY_RUN" FORCE)
-endif()
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+# Hack to support cross-compilation - https://stackoverflow.com/a/49086560
+set(THREADS_PTHREAD_ARG "0" CACHE STRING "Result from TRY_RUN" FORCE)
 
 target_link_libraries(libhailort PRIVATE Threads::Threads)
 target_link_libraries(libhailort PRIVATE hef_proto)
@@ -120,10 +115,6 @@ endif()
 
 if(ENABLE_PERFETTO)
     target_link_libraries(libhailort PRIVATE perfetto)
-endif()
-
-if(CMAKE_SYSTEM_NAME STREQUAL QNX)
-    target_link_libraries(libhailort PRIVATE pci)
 endif()
 
 set(HAILORT_PUBLIC_HEADERS
@@ -215,9 +206,7 @@ install(TARGETS libhailort
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    install(CODE "execute_process(COMMAND ldconfig)")
-endif()
+install(CODE "execute_process(COMMAND ldconfig)")
 
 # Export libhailort
 set(CMAKE_SCRIPTS_DIR ${CMAKE_CURRENT_BINARY_DIR})

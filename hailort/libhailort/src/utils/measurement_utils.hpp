@@ -156,8 +156,7 @@ public:
     {}
 };
 
-// TODO: The helper macros are only available for GCC because of ##__VA_ARGS__ support (HRT-13031)
-#ifdef __GNUC__
+// These helper macros use the GNU-style ##__VA_ARGS__ extension supported by the Linux toolchains.
 #define _CONCAT_HELPER(x, y) x##y
 #define _CONCAT(x, y) _CONCAT_HELPER(x, y)
 
@@ -191,8 +190,6 @@ public:
 //       we measure the value right away and not at the end of a scope.
 #define MEASURE_VALUE(value, accumulator_name_format, ...) \
     hailort::utils::MeasureValue<decltype(value)>((value), #value " (" accumulator_name_format ")", ##__VA_ARGS__)
-
-#endif /* __GNUC__ */
 
 } /* namespace utils */
 } /* namespace hailort */

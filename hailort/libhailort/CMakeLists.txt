@@ -16,10 +16,6 @@ protobuf_generate_python(PROTO_HEF_PY tracer_profiler.proto)
 add_library(hef_proto ${PROTO_HEF_SRC} ${PROTO_HEF_HEADER} ${PROTO_HEF_PY})
 target_link_libraries(hef_proto libprotobuf-lite)
 set_target_properties(hef_proto PROPERTIES CXX_STANDARD 17 GENERATED TRUE POSITION_INDEPENDENT_CODE ON)
-if(CMAKE_HOST_WIN32)
-    # https://github.com/protocolbuffers/protobuf/tree/master/cmake#notes-on-compiler-warnings
-    target_compile_options(hef_proto PRIVATE /wd4244)
-endif()
 get_filename_component(PROTO_HEADER_DIRECTORY ${PROTO_HEF_HEADER} DIRECTORY)
 target_include_directories(hef_proto
     PUBLIC
@@ -31,9 +27,6 @@ protobuf_generate_cpp(PROTO_SCHEDULER_MON_SRC PROTO_SCHEDULER_MON_HEADR schedule
 add_library(scheduler_mon_proto ${PROTO_SCHEDULER_MON_SRC} ${PROTO_SCHEDULER_MON_HEADR})
 target_link_libraries(scheduler_mon_proto libprotobuf-lite)
 set_target_properties(scheduler_mon_proto PROPERTIES CXX_STANDARD 17 GENERATED TRUE POSITION_INDEPENDENT_CODE ON)
-if(CMAKE_HOST_WIN32)
-    target_compile_options(scheduler_mon_proto PRIVATE /wd4244)
-endif()
 get_filename_component(PROTO_SCHEDULER_MON_HEADER_DIRECTORY ${PROTO_SCHEDULER_MON_HEADR} DIRECTORY)
 target_include_directories(scheduler_mon_proto
     PUBLIC
@@ -45,9 +38,6 @@ protobuf_generate_cpp(PROTO_PROFILER_SRC PROTO_PROFILER_HEADR tracer_profiler.pr
 add_library(profiler_proto ${PROTO_PROFILER_SRC} ${PROTO_PROFILER_HEADR})
 target_link_libraries(profiler_proto libprotobuf-lite)
 set_target_properties(profiler_proto PROPERTIES CXX_STANDARD 17 GENERATED TRUE POSITION_INDEPENDENT_CODE ON)
-if(CMAKE_HOST_WIN32)
-    target_compile_options(profiler_proto PRIVATE /wd4244)
-endif()
 get_filename_component(PROTO_PROFILER_HEADER_DIRECTORY ${PROTO_PROFILER_HEADR} DIRECTORY)
 target_include_directories(profiler_proto
     PUBLIC

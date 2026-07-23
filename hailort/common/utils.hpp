@@ -33,16 +33,12 @@
 #include <fstream>
 #include <algorithm>
 
-#ifdef __unix__
 #include <pthread.h>
 #include <csignal>
 #include <cstring>
 #include <iostream>
-#endif
 
-#if defined(__linux__) && !defined(__ANDROID__)
 #include <malloc.h>
-#endif
 
 namespace hailort
 {
@@ -406,14 +402,9 @@ inline hailo_status get_status(const Expected<T> &exp)
 
 #define TRY_V_AS_HRPC_STATUS(var_decl, expr, ...) _TRY_V_AS_HRPC_STATUS(_HAILO_CONCAT(__expected, __COUNTER__), var_decl, expr, __VA_ARGS__)
 
-#ifndef _MSC_VER
 #define IGNORE_DEPRECATION_WARNINGS_BEGIN _Pragma("GCC diagnostic push") \
                                           _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #define IGNORE_DEPRECATION_WARNINGS_END  _Pragma("GCC diagnostic pop")
-#else
-#define IGNORE_DEPRECATION_WARNINGS_BEGIN
-#define IGNORE_DEPRECATION_WARNINGS_END
-#endif
 
 #define FORCE_GET_FIRST_AVAILABLE ("FORCE_GET_FIRST_AVAILABLE")
 
@@ -812,16 +803,12 @@ private:
  * - Clearing caches
  * - Closing connections or sessions that held significant memory
  * 
- * @note On non-Linux platforms or Android, this function is a no-op.
  */
 static inline void release_free_memory()
 {
-#if defined(__linux__) && !defined(__ANDROID__)
     (void)malloc_trim(0);
-#endif
 }
 
-#ifdef __unix__
 // RAII helper used to block SIGINT/SIGTERM in child threads
 class SigwaitThreadCreationContext
 {
@@ -870,7 +857,6 @@ private:
     sigset_t m_original_mask{};
     bool m_was_ctor_successful{false};
 };
-#endif
 
 /// Returns true if the status indicates the device is unreachable (physically disconnected
 /// or communication channel closed). Used to suppress noisy error logs in cleanup paths.

@@ -16,10 +16,6 @@
 
 #include "network_runner.hpp"
 
-#if defined(_MSC_VER)
-#include <mmsystem.h>
-#endif
-
 using namespace hailort;
 
 SignalEventScopeGuard::SignalEventScopeGuard(Event &event) :
@@ -41,24 +37,6 @@ BarrierTerminateScopeGuard::~BarrierTerminateScopeGuard()
         m_barrier->terminate();
     }
 }
-
-#if defined(_MSC_VER) 
-class TimeBeginScopeGuard final
-{
-public:
-    TimeBeginScopeGuard() {
-        // default interval between timer interrupts on Windows is 15.625 ms.
-        // This will change it to be 1 ms, enabling us to sleep in granularity of 1 milliseconds.
-        // As from Windows 10 2004, in general processes are no longer affected by other processes calling timeBeginPeriod.
-        // https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
-        timeBeginPeriod(1);
-    }
-    ~TimeBeginScopeGuard() {
-        timeEndPeriod(1);
-    }
-};
-#endif
-
 
 //TODO: duplicated
 hailo_status NetworkRunner::wait_for_threads(std::vector<AsyncThreadPtr<hailo_status>> &threads)
@@ -361,10 +339,6 @@ hailo_status NetworkRunner::run(EventPtr shutdown_event, LiveStats &live_stats, 
         m_overall_latency_meter, measure_fps, m_params.hef_path, m_params.should_print_ops, computational_ops);
     live_stats.add(net_live_track, 1); //support progress over multiple outputs
 
-#if defined(_MSC_VER)
-    TimeBeginScopeGuard time_begin_scope_guard;
-#endif
-
     activation_barrier.arrive_and_wait();
 
     if ((InferenceMode::RAW_ASYNC_SINGLE_THREAD == m_params.mode) || (InferenceMode::FULL_ASYNC == m_params.mode)) {
@@ -614,7 +588,6 @@ hailo_status FullAsyncNetworkRunner::prepare_input_buffers()
         auto params = get_params(name);
         const auto frame_size = input_config.get_frame_size();
 
-#if defined(__linux__) 
         if (BufferType::DMA_BUFFER == m_params.buffer_type) {
             std::vector<FileDescriptor> fds;
             Buffer temp_buffer;
@@ -646,7 +619,6 @@ hailo_status FullAsyncNetworkRunner::prepare_input_buffers()
             m_dma_input_buffers.emplace(name, std::move(fds));
             continue;
         }
-#endif // not linux or not dma buffer
         Buffer buffer {};
         if (params.input_file_path.empty()) {
             TRY(buffer, create_uniformed_buffer(input_config.get_frame_size(), BufferStorageParams::create_dma()));
@@ -668,7 +640,6 @@ hailo_status FullAsyncNetworkRunner::prepare_output_buffers()
 {
     auto output_names = get_output_names();
     
-#if defined(__linux__) 
     if (BufferType::DMA_BUFFER == m_params.buffer_type) {
         for (const auto &name : output_names) {
             TRY(auto output_config, m_infer_model->output(name));
@@ -680,7 +651,6 @@ hailo_status FullAsyncNetworkRunner::prepare_output_buffers()
         }
         return HAILO_SUCCESS;
     }
-#endif // not linux or not dma buffer
     m_output_buffers.reserve(output_names.size());
     for (const auto &name : output_names) {
         TRY(auto output_config, m_infer_model->output(name));
@@ -733,15 +703,13 @@ hailo_status FullAsyncNetworkRunner::run_single_thread_async_infer(EventPtr shut
         for (uint32_t frames_in_cycle = 0; frames_in_cycle < m_params.batch_size; frames_in_cycle++) {
             for (const auto &name : get_input_names()) {
                 TRY(auto input_config, m_infer_model->input(name));
-#if defined(__linux__) 
-               if(BufferType::DMA_BUFFER == m_params.buffer_type) {
+                if(BufferType::DMA_BUFFER == m_params.buffer_type) {
                     const auto frame_index = frame_id % m_dma_input_buffers.at(name).size();
                     const auto& fd = m_dma_input_buffers.at(name)[frame_index];
                     hailo_dma_buffer_t dmabuf = {fd, input_config.get_frame_size()};
                     CHECK_SUCCESS(m_bindings.input(name)->set_dma_buffer(dmabuf));
                     continue;
                }
-#endif // not linux or not dma buffer
                 auto offset = (frame_id % (m_input_buffers.at(name).size() / input_config.get_frame_size())) * input_config.get_frame_size();
                 CHECK_SUCCESS(m_bindings.input(name)->set_buffer(MemoryView(m_input_buffers.at(name).data() + offset,
                     input_config.get_frame_size())));

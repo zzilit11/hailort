@@ -157,14 +157,8 @@ hailo_status DownloadActionListCommand::write_json(const ordered_json &json_obj,
 }
 
 // We want to make sure that the switch-case bellow handles all of the action types in order to prevent parsing errors
-#if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic error "-Wswitch-enum"
-#endif
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(error: 4061)
-#endif
 
 Expected<ordered_json> DownloadActionListCommand::parse_action_data(uint32_t base_address, uint8_t *action,
     uint32_t current_buffer_offset, uint32_t *action_length, CONTEXT_SWITCH_DEFS__ACTION_TYPE_t action_type,
@@ -381,12 +375,7 @@ Expected<ordered_json> DownloadActionListCommand::parse_action_data(uint32_t bas
     *action_length = static_cast<uint32_t>(action_length_local);
     return action_json;
 }
-#if defined(__GNUC__)
 #pragma GCC diagnostic pop
-#endif
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 Expected<ordered_json> DownloadActionListCommand::parse_single_repeated_action(uint32_t base_address,
     uint8_t *action, uint32_t current_buffer_offset, uint32_t *action_length,

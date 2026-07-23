@@ -642,7 +642,6 @@ hailo_status ConfiguredInferModelRunAsyncHandler::parse_request(const MemoryView
         TRY(auto input, m_run_async_info->bindings.input(input_name));
 
         if (BufferType::DMA_BUFFER == static_cast<BufferType>(request_struct.buffer_infos[buffer_index].type) && m_server.m_is_unix_socket) {
-#ifdef __linux__
             auto stream_size = infer_model_info.input_streams_sizes[input_name];
 
             if (stream_size == request_struct.buffer_infos[buffer_index].size) {
@@ -674,10 +673,6 @@ hailo_status ConfiguredInferModelRunAsyncHandler::parse_request(const MemoryView
                 pix_buffer.number_of_planes = plane_index;
                 input.set_pix_buffer(pix_buffer);
             }
-#else
-            LOGGER__ERROR("DMA buffer is not supported on this platform");
-            return make_unexpected(HAILO_NOT_SUPPORTED);
-#endif
         } else {
             TRY(auto buffer, m_server.m_buffer_pool_per_cim.at(m_configured_infer_model_handle)->acquire_buffer(input_name));
 

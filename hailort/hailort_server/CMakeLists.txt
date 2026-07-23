@@ -33,10 +33,6 @@ set(HAILORT_SERVER_SOURCES
 )
 
 if (HAILO_BUILD_GENAI_SERVER)
-    if (WIN32)
-        message(FATAL_ERROR "Compilation of GenAI Server is not supported on Windows")
-    endif()
-
     include(${HAILO_EXTERNALS_CMAKE_SCRIPTS}/eigen.cmake)
     include(${HAILO_EXTERNALS_CMAKE_SCRIPTS}/tokenizers.cmake)
     include(${HAILO_EXTERNALS_CMAKE_SCRIPTS}/json.cmake)

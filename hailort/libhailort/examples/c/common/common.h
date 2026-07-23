@@ -13,9 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined(_MSC_VER)
-#include <synchapi.h>
-#endif
+#include <unistd.h>
 
 #define FREE(var)                           \
     do {                                    \
@@ -40,13 +38,7 @@
 #define ARRAY_LENGTH(__array) (sizeof((__array)) / sizeof((__array)[0]))
 
 
-#if defined(__unix__)
 #define hailo_sleep(seconds) sleep((seconds))
-#elif defined(_MSC_VER)
-#define hailo_sleep(seconds) Sleep((seconds) * 1000)
-#else /* defined(_MSC_VER) */
-#pragma error("sleep not supported")
-#endif
 
 
 #endif /* _EXAMPLE_COMMON_H_ */

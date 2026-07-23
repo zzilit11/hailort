@@ -45,19 +45,11 @@ typedef struct {
     uint32_t code_size;
 } firmware_header_t;
 
-#if defined(_MSC_VER)
-// TODO: warning C4200
-#pragma warning(push)
-#pragma warning(disable: 4200)
-#endif
 typedef struct {
     uint32_t key_size;
     uint32_t content_size;
     uint8_t certificates_data[0];
 } secure_boot_certificate_t;
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
 
 
 #define MINIMUM_FIRMWARE_CODE_SIZE (20*4)

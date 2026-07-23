@@ -10,8 +10,6 @@
 #ifndef _HAILO_HAILORT_DMAHEAP_H
 #define _HAILO_HAILORT_DMAHEAP_H
 
-#if defined(__linux__)
-
 #include <linux/ioctl.h>
 #include <linux/types.h>
 
@@ -53,7 +51,5 @@ struct dma_heap_allocation_data {
  */
 #define DMA_HEAP_IOCTL_ALLOC	_IOWR(DMA_HEAP_IOC_MAGIC, 0x0,\
 				      struct dma_heap_allocation_data)
-
-#endif /* __linux__ */
 
 #endif /* _HAILO_HAILORT_DMAHEAP_H */

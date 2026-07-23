@@ -11,13 +11,11 @@
 
 #include "md5.h"
 #include <fstream>
-#ifdef __linux__
 #include <glob.h>
 #ifdef GPIO_V2_GET_LINE_IOCTL
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #endif // GPIO_V2_GET_LINE_IOCTL
-#endif // __linux__
 #include <memory>
 #include <filesystem>
 #include <charconv>
@@ -248,7 +246,7 @@ Expected<hailo_extended_device_information_t> IntegratedDevice::get_extended_dev
         std::reverse(info.chip_serial_number, info.chip_serial_number + sizeof(info.chip_serial_number));
     }
 
-#if defined(__linux__) && defined(GPIO_V2_GET_LINE_IOCTL)
+#ifdef GPIO_V2_GET_LINE_IOCTL
     if (m_device_architecture == HAILO_ARCH_HAILO10H) {
         TRY(info.gpio_mask, GpioReader().read());
     }
@@ -265,7 +263,6 @@ Expected<bool> IntegratedDevice::has_power_sensor()
     }
 
     bool has_power_sensor = false;
-    #ifdef __linux__
     glob_t glob_result;
     constexpr auto SENSOR_NAME_FILE_PATHS = "/sys/class/hwmon/hwmon*/name";
     glob(SENSOR_NAME_FILE_PATHS, GLOB_TILDE, NULL, &glob_result);
@@ -284,11 +281,10 @@ Expected<bool> IntegratedDevice::has_power_sensor()
         }
     }
     globfree(&glob_result);
-    #endif // __linux__
     return has_power_sensor;
 }
 
-#if defined(__linux__) && defined(GPIO_V2_GET_LINE_IOCTL)
+#ifdef GPIO_V2_GET_LINE_IOCTL
 IntegratedDevice::GpioReader::~GpioReader()
 {
     if (m_request_fd >= 0) {
@@ -327,7 +323,7 @@ Expected<uint16_t> IntegratedDevice::GpioReader::read()
 
     return static_cast<uint16_t>(values.bits);
 }
-#endif // __linux__
+#endif // GPIO_V2_GET_LINE_IOCTL
 
 Expected<uint32_t> IntegratedDevice::get_current_limit()
 {

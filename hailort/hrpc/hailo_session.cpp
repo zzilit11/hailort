@@ -31,11 +31,7 @@ Expected<std::shared_ptr<SessionListener>> SessionListener::create_shared(std::s
     case Device::Type::INTEGRATED:
         return OsListener::create_shared(std::static_pointer_cast<OsConnectionContext>(context), port);
     case Device::Type::USB:
-#ifdef __linux__
         return UsbListener::create_shared(std::static_pointer_cast<UsbConnectionContext>(context), port);
-#else
-        return make_unexpected(HAILO_NOT_SUPPORTED);
-#endif
     case Device::Type::PCIE:
         return RawPcieListener::create_shared(std::static_pointer_cast<PcieConnectionContext>(context), port);
     default:

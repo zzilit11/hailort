@@ -10,16 +10,10 @@
 #ifndef _HAILOPP_PLATFORM_H_
 #define _HAILOPP_PLATFORM_H_
 
-/** Exported symbols define */
+#ifndef __linux__
+#error "HailoPP supports Linux only"
+#endif
 
-#if defined(_MSC_VER)
-#if defined(_HAILOPP_EXPORTING)
-#define HAILOPPAPI __declspec(dllexport)
-#else
-#define HAILOPPAPI __declspec(dllimport)
-#endif
-#else
 #define HAILOPPAPI __attribute__ ((visibility ("default")))
-#endif
 
 #endif /* _HAILOPP_PLATFORM_H_ */

@@ -20,13 +20,7 @@
 #include <mutex>
 #include <memory>
 
-#if defined(__GNUC__)
 #include <dirent.h>
-#endif
-
-#if defined(_MSC_VER)
-#include <minwinbase.h>
-#endif
 
 namespace hailort
 {
@@ -46,8 +40,8 @@ public:
     /**
      * Gets the path to the temporary directory.
      *
-     * @return Upon success, returns Expected of the temporary directory path string, ending with / on posix systems
-     * or with \ on windows systems. Otherwise, returns Unexpected of ::hailo_status error.
+     * @return Upon success, returns the temporary directory path ending with `/`.
+     * Otherwise, returns Unexpected of ::hailo_status error.
      */
     static Expected<std::string> get_temp_path();
 
@@ -69,7 +63,6 @@ public:
     static std::string basename(const std::string &file_name);
 };
 
-// TODO: HRT-7304 - Add support for windows
 class TempFile {
 public:
     static Expected<TempFile> create(const std::string &file_name, const std::string &file_directory = "");

@@ -431,13 +431,6 @@ std::vector<hailo_device_architecture_t> DeviceBase::hef_arch_to_device_compatib
 
 Expected<size_t> DeviceBase::fetch_logs(MemoryView buffer, hailo_log_type_t log_type)
 {
-#ifndef __linux__
-    (void)(buffer);
-    (void)(log_type);
-    LOGGER__ERROR("fetch_logs is supported only on Linux systems");
-    return make_unexpected(HAILO_NOT_SUPPORTED);
-#else
-
     TRY(auto device_arch, get_architecture());
     CHECK((device_arch == HAILO_ARCH_HAILO15H) || (device_arch == HAILO_ARCH_HAILO15L) || (device_arch == HAILO_ARCH_HAILO15M) ||
         (device_arch == HAILO_ARCH_HAILO10H) || (device_arch == HAILO_ARCH_HAILO12L), HAILO_INVALID_DEVICE_ARCHITECTURE,
@@ -452,7 +445,6 @@ Expected<size_t> DeviceBase::fetch_logs(MemoryView buffer, hailo_log_type_t log_
     TRY(auto logger_fetcher, LoggerFetcherFactory::create(log_type));
 
     return logger_fetcher->fetch_log(buffer, *this);
-#endif
 }
 
 void DeviceBase::check_clock_rate_for_hailo8(uint32_t clock_rate, HEFHwArch hef_hw_arch)

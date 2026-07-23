@@ -1,23 +1,14 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(pyhailort)
 
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(FATAL_ERROR "pyHailoRT supports Linux only")
+endif()
+
 find_program(CCACHE_PROGRAM ccache)
-find_program(CLACHE_PROGRAM clcache)
 
 if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-elseif(CLCACHE_PROGRAM)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CLCACHE_PROGRAM}")
-endif()
-
-if(WIN32)
-    find_program(SCCACHE sccache)
-    if(SCCACHE)
-        set(CMAKE_C_COMPILER_LAUNCHER ${SCCACHE})
-        set(CMAKE_CXX_COMPILER_LAUNCHER ${SCCACHE})
-        set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT Embedded)
-        cmake_policy(SET CMP0141 NEW)
-    endif()
 endif()
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.9")
@@ -31,11 +22,9 @@ set(HAILORT_VERSION_MAJOR 5)
 set(HAILORT_VERSION_MINOR 3)
 set(HAILORT_VERSION_REVISION 0)
 
-if(UNIX)
-    # PYTHON_MODULE_EXTENSION does not take the CMAKE_SYSTEM_PROCESSOR into account so it needs to be added manually
-    string(REGEX REPLACE "\\." "" PYBIND11_PYTHON_VERSION_NO_DOT ${PYBIND11_PYTHON_VERSION})
-    set(PYTHON_MODULE_EXTENSION ".cpython-${PYBIND11_PYTHON_VERSION_NO_DOT}-${CMAKE_SYSTEM_PROCESSOR}-linux-gnu.so")
-endif()
+# PYTHON_MODULE_EXTENSION does not take the CMAKE_SYSTEM_PROCESSOR into account so it needs to be added manually
+string(REGEX REPLACE "\\." "" PYBIND11_PYTHON_VERSION_NO_DOT ${PYBIND11_PYTHON_VERSION})
+set(PYTHON_MODULE_EXTENSION ".cpython-${PYBIND11_PYTHON_VERSION_NO_DOT}-${CMAKE_SYSTEM_PROCESSOR}-linux-gnu.so")
 
 get_filename_component(
     HAILO_PYHAILORT_DIR
@@ -74,14 +63,6 @@ set_target_properties(_pyhailort PROPERTIES
     CXX_VISIBILITY_PRESET     hidden
 )
 
-if (WIN32)
-    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-        target_compile_definitions(_pyhailort PRIVATE _AMD64_=1)
-    else()
-        target_compile_definitions(_pyhailort PRIVATE _X86_=1)
-    endif()
-endif()
-
 if(LIBHAILORT_PATH AND HAILORT_INCLUDE_DIR)
     message(STATUS "Will link against given libhailort: ${LIBHAILORT_PATH}")
     message(STATUS "Will include given include dir:     ${HAILORT_INCLUDE_DIR}")
@@ -108,18 +89,7 @@ else()
     target_link_libraries(_pyhailort PRIVATE HailoRT::libhailort)
 endif()
 
-if(WIN32)
-    target_link_libraries(_pyhailort PRIVATE Ws2_32)
-    target_compile_options(_pyhailort PRIVATE
-        /DWIN32_LEAN_AND_MEAN
-        /DNOMINMAX                  # NOMINMAX is required in order to avoid conflicts with std::min/std::max (otherwise Windows.h defines it's own)
-        /wd4201                     # Anonymous union/struct
-        /wd4251                     # C++ ABI with STL
-    )
-elseif(NOT CMAKE_SYSTEM_NAME STREQUAL Android)
-    # TODO: HRT-14770 fix android build
-    target_link_libraries(_pyhailort PRIVATE rt)
-endif()
+target_link_libraries(_pyhailort PRIVATE rt)
 
 install(
     TARGETS _pyhailort

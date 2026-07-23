@@ -10,24 +10,14 @@
 #ifndef _HAILOTRACKER_SRC_EIGEN_WRAPPER_HPP_
 #define _HAILOTRACKER_SRC_EIGEN_WRAPPER_HPP_
 
-// Disable warning 4127
-#ifdef _MSC_VER
-    #pragma warning(push)
-    #pragma warning(disable: 4127)
-#else
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wconversion"
-    #if defined(__GNUC__) && (__GNUC__ >= 11)
-        #pragma GCC diagnostic ignored "-Wclass-memaccess"
-    #endif
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#if defined(__GNUC__) && (__GNUC__ >= 11)
+    #pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
 
 #include <Eigen/Dense>
 
-#ifdef _MSC_VER
-    #pragma warning(pop)
-#else
-    #pragma GCC diagnostic pop
-#endif
+#pragma GCC diagnostic pop
 
 #endif // _HAILOTRACKER_SRC_EIGEN_WRAPPER_HPP_

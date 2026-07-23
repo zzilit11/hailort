@@ -16,10 +16,6 @@
 #include <math.h>
 #include <fenv.h>
 
-#ifdef _MSC_VER
-#include <immintrin.h>
-#endif
-
 namespace hailort
 {
 
@@ -35,14 +31,7 @@ namespace net_flow
 
 inline float bankers_round(float x)
 {
-#ifdef _MSC_VER
-    // These instructions are intrinsics that the Microsoft C/C++ compiler supports when x86 is targeted
-    __m128 xmm = _mm_set_ss(x);
-    xmm = _mm_round_ss(xmm, xmm, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
-    return _mm_cvtss_f32(xmm);
-#else
     return rintf(x);
-#endif
 }
 
 class RoundingToNearestGuard final

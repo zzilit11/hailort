@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 3.5.0)
 
 project(hailort-examples-cpp-query-performance-and-health-stats)
 
-if (NOT UNIX)
-    message(FATAL_ERROR "The Performance and Health Stats Query Example is only available on UNIX systems")
-endif()
-
 find_package(HailoRT 5 REQUIRED)
 
 

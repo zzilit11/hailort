@@ -12,11 +12,7 @@
 
 #include <string.h>
 
-#if defined(__unix__)
 #include <sys/mman.h>
-#elif defined(_MSC_VER)
-#include <memoryapi.h>
-#endif
 
 
 #define HEF_FILE ("hefs/shortcut_net.hef")
@@ -25,17 +21,9 @@
 #define MAX_ONGOING_TRANSFERS (16)
 #define INFER_TIME_SECONDS (5)
 
-#if defined(__unix__)
 #define INVALID_ADDR (MAP_FAILED)
 #define page_aligned_alloc(size) mmap(NULL, (size), PROT_WRITE | PROT_READ, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0)
 #define page_aligned_free(addr, size) munmap((addr), (size))
-#elif defined(_MSC_VER)
-#define INVALID_ADDR (NULL)
-#define page_aligned_alloc(size) VirtualAlloc(NULL, (size), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE)
-#define page_aligned_free(addr, size) VirtualFree((addr), 0, MEM_RELEASE)
-#else /* defined(_MSC_VER) */
-#pragma error("Aligned alloc not supported")
-#endif
 
 #ifndef MIN
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))

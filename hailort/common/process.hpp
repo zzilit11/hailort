@@ -30,7 +30,6 @@ public:
     Process() = delete;
 
 private:
-    #if defined(__GNUC__)
     class PopenWrapper final {
     public:
         static Expected<PopenWrapper> create(const std::string &command_line);
@@ -50,7 +49,6 @@ private:
         const std::string m_command_line;
         FILE* m_pipe;
     };
-    #endif
 };
 
 } /* namespace hailort */

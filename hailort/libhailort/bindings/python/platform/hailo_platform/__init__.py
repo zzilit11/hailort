@@ -28,10 +28,7 @@ from hailo_platform.pyhailort.pyhailort import (HEF, ConfigureParams,
 
 def _verify_pyhailort_lib_exists():
     python_version = "".join(str(i) for i in sys.version_info[:2])
-    lib_extension = {
-        "posix": "so",
-        "nt": "pyd",  # Windows
-    }[os.name]
+    lib_extension = "so"
 
     path = f"{__path__[0]}/pyhailort/"
     if next(pathlib.Path(path).glob(f"_pyhailort*.{lib_extension}"), None) is None:

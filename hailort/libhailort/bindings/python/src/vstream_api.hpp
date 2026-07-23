@@ -59,9 +59,7 @@ public:
     std::unordered_map<std::string, std::shared_ptr<InputVStream>> m_input_vstreams;
 
 private:
-#ifdef HAILO_IS_FORK_SUPPORTED
     AtForkRegistry::AtForkGuard m_atfork_guard;
-#endif
 };
 
 class OutputVStreamWrapper final
@@ -96,9 +94,7 @@ public:
     std::unordered_map<std::string, std::shared_ptr<OutputVStream>> m_output_vstreams;
 
 private:
-#ifdef HAILO_IS_FORK_SUPPORTED
     AtForkRegistry::AtForkGuard m_atfork_guard;
-#endif
 };
 
 class InferVStreamsWrapper final

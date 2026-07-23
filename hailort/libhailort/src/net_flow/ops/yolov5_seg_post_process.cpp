@@ -13,15 +13,11 @@
 #include "transform/eigen.hpp"
 #include <cmath>
 
-#ifndef _MSC_VER
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
-#endif // Not MSC
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
-#ifndef _MSC_VER
 #pragma GCC diagnostic pop
-#endif // Not MSC
 
 namespace hailort
 {
@@ -286,19 +282,10 @@ Expected<uint32_t> Yolov5SegPostProcess::copy_detection_to_result_buffer(MemoryV
     uint32_t copied_bytes_amount = 0;
 
     // Suppress deprecated declaration warning
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
     detection.m_bbox_with_mask.mask = static_cast<uint8_t*>(buffer.data() + buffer_offset + detection_size);
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#else
 #pragma GCC diagnostic pop
-#endif
 
     detection.m_bbox_with_mask.mask_offset = buffer_offset + detection_size;
 

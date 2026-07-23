@@ -49,9 +49,6 @@ public:
     CursorAdjustment();
     ~CursorAdjustment();
 private:
-#if defined(_WIN32)
-    unsigned int m_previous_output_buffer_mode;
-#endif /* _WIN32 */
 };
 
 #define _HAILORT_OS_LOG(level, ...)  SPDLOG_LOGGER_CALL(hailort::HailoRTOSLogger::get_instance().logger(), level, __VA_ARGS__)

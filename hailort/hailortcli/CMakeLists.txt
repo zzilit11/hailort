@@ -42,12 +42,9 @@ set(HAILORTCLI_CPP_FILES
     download_action_list_command.cpp
     )
 
-if(UNIX)
-    # Unix only modules
-    set(HAILORTCLI_CPP_FILES ${HAILORTCLI_CPP_FILES}
-        measure_nnc_performance_command.cpp
-        )
-endif()
+set(HAILORTCLI_CPP_FILES ${HAILORTCLI_CPP_FILES}
+    measure_nnc_performance_command.cpp
+    )
 
 # 'config_definitions_json_file' is used in generate_definitions_json_str.in for configure_file()
 file(READ "${PROJECT_SOURCE_DIR}/common/config_definitions.json" config_definitions_json_file)
@@ -81,10 +78,6 @@ target_link_libraries(hailortcli
 
 if(HAILO_BUILD_CLIENT_TOKENIZER)
     target_link_libraries(hailortcli tokenizers_cpp)
-endif()
-
-if(WIN32)
-    target_link_libraries(hailortcli winmm.lib) # Used for timeBeginPeriod, timeEndPeriod
 endif()
 
 target_include_directories(hailortcli
